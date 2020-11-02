@@ -354,6 +354,7 @@ GameObject:
   - component: {fileID: 841630633}
   - component: {fileID: 841630632}
   - component: {fileID: 841630634}
+  - component: {fileID: 841630635}
   m_Layer: 0
   m_Name: ControlJuego
   m_TagString: Untagged
@@ -373,6 +374,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a2cd957c1082fd4db9e032ebe0a3e7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  botonesMenu: []
+  nombre: {fileID: 0}
   audio: {fileID: 841630634}
   imagenAudioOn: {fileID: 21300000, guid: fdf4bddeecc501b419d9f6527f1b7203, type: 3}
   imagenAudioOff: {fileID: 21300000, guid: 214219e162f23b34bb6542f1cf666ac3, type: 3}
@@ -487,6 +490,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &841630635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 841630631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6400ec1840d721d4b9706946c82945be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1026794682
 GameObject:
   m_ObjectHideFlags: 0
