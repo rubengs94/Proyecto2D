@@ -3,96 +3,40 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using System.Globalization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
 using System;
-using System.Diagnostics;
 
 public class ControlJuego : MonoBehaviour
 {
-    public Button[] botonesMenu;
+
     public AudioSource audio;
     public Sprite imagenAudioOn;
     public Sprite imagenAudioOff;
     public Button BotonAudio;
-    public int monedas;
-    public Text cantidadMonedas;
 
-    private string rutaArchivo;
 
-    void Awake()
+    #region CambiarNivel
+    public void CambiarNivel (int nivel)
     {
-        rutaArchivo = Application.persistentDataPath + "/data.dat";
-    }
-
-    void Start()
-    {
-        Guardar();
-    }
-    
-
-    void Update()
-    {
-        if (cantidadMonedas!= null)
-        {
-            cantidadMonedas.text = "Monedas: "+monedas.ToString();
-        }
-    }
-
-    #region SaveData
-    public void Guardar()
-    {
-        BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create(rutaArchivo);
-        Jugador datos = new Jugador();
-        datos.monedas = monedas;
-        bf.Serialize(file, datos);
-        file.Close();
-        Cargar();
-    }//guardar
-
-    public void Cargar()
-    {
-        if (File.Exists(rutaArchivo))
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(rutaArchivo, FileMode.Open);
-            Jugador datos = (Jugador)bf.Deserialize(file);
-            monedas = datos.monedas;
-        }
-        else
-           monedas = 0;
-    }//cargar
-
+            switch (nivel)
+            {
+                case -1: Application.Quit(); break;
+                case 0: SceneManager.LoadScene("MenuPrincipal"); break;
+                case 1: SceneManager.LoadScene("SeleccionarNivel"); break;
+                case 2: SceneManager.LoadScene("Nivel1"); break;
+                case 3: SceneManager.LoadScene("Nivel2"); break;
+                case 4: SceneManager.LoadScene("Nivel3"); break;
+                case 5: SceneManager.LoadScene("Nivel4"); break;
+                case 6: SceneManager.LoadScene("Nivel5"); break;
+                case 7: SceneManager.LoadScene("Nivel6"); break;
+            }
+    }//cambiarnivel
     #endregion
 
-
-
-
-
-    #region NivelesYEscenas
-
-    public void CambiarNivel(int nivel)
-    {
-        if (nivel == 0)
-            SceneManager.LoadScene("Menú");
-        else
-            SceneManager.LoadScene("Nivel" + nivel);
-    }
-
-    public void Salir()
-    {
-        print("Saliste del juego");
-        Application.Quit();
-    }
-
-    #endregion
 
     #region Musica
-
-    private bool On = true;
-
+   
+    private bool On = false;
+    
     public void Reproducir()
     {
         if (On)
@@ -118,11 +62,5 @@ public class ControlJuego : MonoBehaviour
 
     #endregion
 
-    #region Jugador
-    [Serializable]
-    class Jugador
-    {
-        public int monedas;
-    }
-    #endregion
+
 }
