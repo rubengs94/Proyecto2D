@@ -16,6 +16,7 @@ public class CargarYGuardar : MonoBehaviour
     public Text texto;
     public int monedas;
 
+    public void prueba() { }
     private void Start()
     {
         SettingsData settings = new SettingsData();
