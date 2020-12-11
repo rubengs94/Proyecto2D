@@ -4,8 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
+using UnityEngine.EventSystems;
 
-public class ControlJuego : MonoBehaviour
+
+public class ControlJuego : MonoBehaviour, IPointerClickHandler
 {
 
     public AudioSource audio;
@@ -13,28 +15,36 @@ public class ControlJuego : MonoBehaviour
     public Sprite imagenAudioOff;
     public Button BotonAudio;
 
+    public Escenas cargarEscena;
+
+    public enum Escenas
+    {
+        MenuPrincipal,
+        Nivel1
+    }
 
     #region CambiarNivel
+    /*
     public void CambiarNivel (int nivel)
     {
             switch (nivel)
             {
                 case -1: Application.Quit(); break;
                 case 0: SceneManager.LoadScene("MenuPrincipal"); break;
-                case 1: SceneManager.LoadScene("SeleccionarNivel"); break;
-                case 2: SceneManager.LoadScene("Nivel1"); break;
-                case 3: SceneManager.LoadScene("Nivel2"); break;
-                case 4: SceneManager.LoadScene("Nivel3"); break;
-                case 5: SceneManager.LoadScene("Nivel4"); break;
-                case 6: SceneManager.LoadScene("Nivel5"); break;
-                case 7: SceneManager.LoadScene("Nivel6"); break;
+                case 1: SceneManager.LoadScene("Nivel1"); break;
             }
     }//cambiarnivel
+    */
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        PantallaDeCarga.Instancia.CargarEscena(cargarEscena.ToString());
+    }
     #endregion
 
 
     #region Musica
-   
+
     private bool On = false;
     
     public void Reproducir()
