@@ -2,9 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\Assets",
-    "\\Assets\\Scripts",
-    "\\Library\\ScriptAssemblies"
+    "\\Assets\\Scripts"
   ],
-  "SelectedNode": "\\Assets\\Scripts\\ControlJuego.cs",
+  "SelectedNode": "\\Assets\\Scripts\\CargarYGuardar.cs",
   "PreviewInSolutionExplorer": false
 }
