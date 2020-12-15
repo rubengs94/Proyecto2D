@@ -13,15 +13,11 @@ public class CargarYGuardar : MonoBehaviour
     private JsonData itemData;
     private String jsonText;
     //variables de usuario
-    public Text texto;
     public int monedas;
 
     private void Start()
     {
         SettingsData settings = new SettingsData();
-
-        settings.nombre = new Nombre();
-        settings.nombre.nombre = texto.ToString();
         
         settings.monedas = new Monedas();
         settings.monedas.monedas = monedas;
@@ -40,15 +36,8 @@ public class CargarYGuardar : MonoBehaviour
     [Serializable]
     public class SettingsData
     {
-        public Nombre nombre;
         public Tiempo tiempo;
         public Monedas monedas;
-    }
-
-    [Serializable]
-    public class Nombre
-    {
-        public String nombre;
     }
     [Serializable]
     public class Tiempo
