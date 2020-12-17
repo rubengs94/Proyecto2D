@@ -1,41 +1,29 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using System;
-using System.Text;
+﻿using LitJson;
 using System.IO;
-using LitJson;
+using UnityEngine;
 
 public class CargarYGuardar : MonoBehaviour
 {
-    //json
-    private JsonData itemData;
-    private String jsonText;
-    //variables de usuario
-    public int monedas;
-    
-    private void Start()
+
+    public void Guardar(int monedas, double tiempo)
     {
-        DatosUsuario settings = new DatosUsuario(monedas, 2.7f);
-
-        itemData = JsonMapper.ToJson(settings);
-        File.WriteAllText(Application.dataPath + "/DatosUsuario/Datos.txt", itemData.ToString());
-
-        Debug.Log(JsonUtility.ToJson(settings));
+        DatosUsuario settings = new DatosUsuario(monedas, tiempo);
+        
+        File.WriteAllText(Application.persistentDataPath + "/DatosUsuario/Datos.txt", JsonMapper.ToJson(settings).ToString());
     }
+}
 
+#region DATOSUSUARIO
 
     class DatosUsuario
     {
         public int monedas;
-        public float tiempo;
+        public double tiempo;
 
-        public DatosUsuario(int monedas, float tiempo)
+        public DatosUsuario(int monedas, double tiempo)
         {
             this.monedas = monedas;
             this.tiempo = tiempo;
         }
-    }
-
-}
+    }//DatosUsuario
+#endregion

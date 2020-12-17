@@ -9,20 +9,20 @@ using UnityEngine.EventSystems;
 
 public class ControlJuego : MonoBehaviour, IPointerClickHandler
 {
-
+    #region PROPIEDADES
     public AudioSource audio;
     public Sprite imagenAudioOn;
     public Sprite imagenAudioOff;
     public Button BotonAudio;
-    CargarYGuardar cargarYGuardar;
-
     public Escenas cargarEscena;
-
     public enum Escenas
     {
         MenuPrincipal,
         Nivel1
     }
+    public int monedas = 0;
+    public double tiempo = 0;
+    #endregion
 
     #region CambiarNivel
     /*
@@ -42,7 +42,6 @@ public class ControlJuego : MonoBehaviour, IPointerClickHandler
         PantallaDeCarga.Instancia.CargarEscena(cargarEscena.ToString());
     }
     #endregion
-
 
     #region Musica
 
@@ -73,5 +72,18 @@ public class ControlJuego : MonoBehaviour, IPointerClickHandler
 
     #endregion
 
+    #region CARGARYGUARDAR
 
+    CargarYGuardar cargaryguardar;
+
+    public void Guardar()
+    {
+        cargaryguardar.Guardar(monedas,tiempo);
+    }
+
+    public void Cargar()
+    {
+
+    }
+    #endregion
 }
