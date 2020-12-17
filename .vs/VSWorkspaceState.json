@@ -3,9 +3,8 @@
     "",
     "\\Proyecto",
     "\\Proyecto\\Assets",
-    "\\Proyecto\\Assets\\Scripts",
-    "\\Proyecto\\Library"
+    "\\Proyecto\\Assets\\Scripts"
   ],
-  "SelectedNode": "\\Proyecto\\Assets\\Scripts\\MovimientoJugador.cs",
+  "SelectedNode": "\\Proyecto\\Assets\\Scripts\\ControlJuego.cs",
   "PreviewInSolutionExplorer": false
 }

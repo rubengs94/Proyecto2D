@@ -74,10 +74,11 @@ public class ControlJuego : MonoBehaviour, IPointerClickHandler
 
     #region CARGARYGUARDAR
 
-    CargarYGuardar cargaryguardar;
+    CargarYGuardar cargaryguardar = null;
 
     public void Guardar()
     {
+        cargaryguardar = new CargarYGuardar();
         cargaryguardar.Guardar(monedas,tiempo);
     }
 

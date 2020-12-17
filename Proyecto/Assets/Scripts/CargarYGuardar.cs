@@ -9,13 +9,13 @@ public class CargarYGuardar : MonoBehaviour
     {
         DatosUsuario settings = new DatosUsuario(monedas, tiempo);
         
-        File.WriteAllText(Application.persistentDataPath + "/DatosUsuario/Datos.txt", JsonMapper.ToJson(settings).ToString());
+        File.WriteAllText(Application.persistentDataPath + "/Datos.txt", JsonMapper.ToJson(settings).ToString());
     }
 }
 
 #region DATOSUSUARIO
 
-    class DatosUsuario
+    public class DatosUsuario
     {
         public int monedas;
         public double tiempo;
