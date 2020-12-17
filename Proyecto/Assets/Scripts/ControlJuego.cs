@@ -18,7 +18,7 @@ public class ControlJuego : MonoBehaviour, IPointerClickHandler
     public enum Escenas
     {
         MenuPrincipal,
-        Nivel1,
+        Nivel1
     }
     public int monedas = 0;
     public double tiempo = 0;
