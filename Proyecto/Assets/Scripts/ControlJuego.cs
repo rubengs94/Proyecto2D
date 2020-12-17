@@ -14,6 +14,7 @@ public class ControlJuego : MonoBehaviour, IPointerClickHandler
     public Sprite imagenAudioOn;
     public Sprite imagenAudioOff;
     public Button BotonAudio;
+    CargarYGuardar cargarYGuardar;
 
     public Escenas cargarEscena;
 

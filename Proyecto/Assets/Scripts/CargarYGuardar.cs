@@ -14,39 +14,28 @@ public class CargarYGuardar : MonoBehaviour
     private String jsonText;
     //variables de usuario
     public int monedas;
-
+    
     private void Start()
     {
-        SettingsData settings = new SettingsData();
-        
-        settings.monedas = new Monedas();
-        settings.monedas.monedas = monedas;
-
-        settings.tiempo = new Tiempo();
-        settings.tiempo.tiempo = 2.7F;
+        DatosUsuario settings = new DatosUsuario(monedas, 2.7f);
 
         itemData = JsonMapper.ToJson(settings);
-        File.WriteAllText(Application.dataPath + "/DatosUsuario/Datos.json", itemData.ToString());
-
+        File.WriteAllText(Application.dataPath + "/DatosUsuario/Datos.txt", itemData.ToString());
 
         Debug.Log(JsonUtility.ToJson(settings));
     }
 
 
-    [Serializable]
-    public class SettingsData
-    {
-        public Tiempo tiempo;
-        public Monedas monedas;
-    }
-    [Serializable]
-    public class Tiempo
-    {
-        public float tiempo;
-    }
-    [Serializable]
-    public class Monedas
+    class DatosUsuario
     {
         public int monedas;
+        public float tiempo;
+
+        public DatosUsuario(int monedas, float tiempo)
+        {
+            this.monedas = monedas;
+            this.tiempo = tiempo;
+        }
     }
+
 }
