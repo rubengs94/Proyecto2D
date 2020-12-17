@@ -62,7 +62,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\CargarYGuardar.cs" />
+    <Compile Include="Assets\Scripts\CargarYGuardar1.cs" />
     <Compile Include="Assets\Scripts\ControlJuego.cs" />
     <Compile Include="Assets\Scripts\ControlJugador.cs" />
     <Compile Include="Assets\Scripts\MovimientoJugador.cs" />
@@ -250,6 +250,9 @@
     <Reference Include="UnityEditor">
       <HintPath>D:/Program Files/Unity/install/2019.4.10f1/Editor/Data/Managed/UnityEditor.dll</HintPath>
     </Reference>
+    <Reference Include="LitJson">
+      <HintPath>C:/Users/ruben/Documents/Proyecto/Cambios/Proyecto/Assets/Scripts/plugins/LitJson.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Analytics.Editor">
       <HintPath>C:/Users/ruben/Documents/Proyecto/Cambios/Proyecto/Library/PackageCache/com.unity.analytics@3.3.5/Unity.Analytics.Editor.dll</HintPath>
     </Reference>
@@ -258,9 +261,6 @@
     </Reference>
     <Reference Include="Unity.Analytics.StandardEvents">
       <HintPath>C:/Users/ruben/Documents/Proyecto/Cambios/Proyecto/Library/PackageCache/com.unity.analytics@3.3.5/AnalyticsStandardEvents/Unity.Analytics.StandardEvents.dll</HintPath>
-    </Reference>
-    <Reference Include="LitJson">
-      <HintPath>C:/Users/ruben/Documents/Proyecto/Cambios/Proyecto/Assets/Scripts/plugins/LitJson.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>D:/Program Files/Unity/install/2019.4.10f1/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>
