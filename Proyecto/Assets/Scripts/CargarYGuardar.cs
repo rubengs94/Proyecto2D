@@ -1,6 +1,7 @@
 ﻿using LitJson;
 using System.IO;
 using UnityEngine;
+using System;
 
 public class CargarYGuardar : MonoBehaviour
 {
@@ -9,12 +10,14 @@ public class CargarYGuardar : MonoBehaviour
     {
         DatosUsuario settings = new DatosUsuario(monedas, tiempo);
 
-        File.WriteAllText(Application.persistentDataPath + "/Datos.txt", JsonMapper.ToJson(settings).ToString());
+        File.WriteAllText(Application.persistentDataPath + "/Datos.dat", JsonMapper.ToJson(settings).ToString());
+
+
     }
 }
 
 #region DATOSUSUARIO
-
+[Serializable]
 public class DatosUsuario
 {
     public int monedas;

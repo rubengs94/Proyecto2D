@@ -62,7 +62,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\CargarYGuardar1.cs" />
+    <Compile Include="Assets\Scripts\CargarYGuardar.cs" />
     <Compile Include="Assets\Scripts\ControlJuego.cs" />
     <Compile Include="Assets\Scripts\ControlJugador.cs" />
     <Compile Include="Assets\Scripts\MovimientoJugador.cs" />
