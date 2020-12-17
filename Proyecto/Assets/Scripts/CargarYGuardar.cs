@@ -14,7 +14,7 @@ public class CargarYGuardar : MonoBehaviour
     private String jsonText;
     //variables de usuario
     public int monedas;
-
+    
     private void Start()
     {
         SettingsData settings = new SettingsData();
