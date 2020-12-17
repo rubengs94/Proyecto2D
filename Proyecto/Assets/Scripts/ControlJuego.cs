@@ -19,7 +19,6 @@ public class ControlJuego : MonoBehaviour, IPointerClickHandler
     {
         MenuPrincipal,
         Nivel1,
-        Nivel2
     }
     public int monedas = 0;
     public double tiempo = 0;
