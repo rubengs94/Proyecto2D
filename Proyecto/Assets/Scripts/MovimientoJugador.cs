@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class MovimientoJugador : MonoBehaviour
 {
     Rigidbody2D rb;
