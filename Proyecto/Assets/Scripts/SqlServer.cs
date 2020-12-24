@@ -1,8 +1,10 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
+using LitJson;
 using System.Data;
 using System.Data.Common;
 using UnityEngine;
+using System.IO;
 
 public class SqlServer : MonoBehaviour
 {
@@ -16,8 +18,15 @@ public class SqlServer : MonoBehaviour
     DataSet ds;
     DataTable dt;
     DataRow dr;
+    private string rutaPath;
     string query;
     string respuesta;
+    string jsonText;
+    private JsonData itemData;
+    private string guidCargado;
+    private string nombreCargado;
+    private int monedasCargadas;
+    private double tiempoCargado;
 
     #endregion
 
@@ -30,6 +39,10 @@ public class SqlServer : MonoBehaviour
 
     }
 
+    private void Awake()
+    {
+        rutaPath = Application.dataPath + "/Guid.json";
+    }
 
     #region MANEJO DE DATOS
 
@@ -39,7 +52,34 @@ public class SqlServer : MonoBehaviour
     public void CargarDatosUsuario(string guid)
     {
 
-    }
+        try
+        {
+            query = "SELECT * FROM datosjugador WHERE Guid like '"+ guid +"';";
+            cmd = new MySqlCommand(query, conexion);
+            conexion.Open();
+            cmd.ExecuteNonQuery();
+            conexion.Close();
+
+            adaptador = new MySqlDataAdapter(query, conexion);
+            dt = new DataTable();
+            adaptador.Fill(dt);
+
+            guidCargado = dt.Rows[0]["Guid"].ToString();
+            nombreCargado = dt.Rows[0]["Nombre"].ToString();
+            monedasCargadas = int.Parse(dt.Rows[0]["Monedas"].ToString());
+            tiempoCargado = Double.Parse(dt.Rows[0]["Tiempo"].ToString());
+
+            Debug.Log("Se han cargado los datos con exito");
+            conexion.Close();
+
+        }
+        catch (MySqlException ex)
+        {
+            Debug.Log("Error al cargar los datos: " + ex);
+            cmd.Cancel();
+            conexion.Close();
+        }
+    }//CargarDatosUsuario();
 
     /// <summary>
     /// Insertart datos del usuario
@@ -70,28 +110,94 @@ public class SqlServer : MonoBehaviour
             cmd.Cancel();
             conexion.Close();
         }
-
-    }
+    }//InsertarDatos();
 
     /// <summary>
     /// Actualizar datos del usuario
     /// </summary>
-    /// <param name="nombre"></param>
     /// <param name="monedas"></param>
     /// <param name="tiempo"></param>
-    public void ActualizarDatos(string nombre, int monedas, string tiempo)
+    public void ActualizarDatos(int monedas, string tiempo)
     {
+        jsonText = File.ReadAllText(rutaPath);
+        itemData = JsonMapper.ToObject(jsonText);
+        string guid = itemData[0]["guid"].ToString();
 
-    }
+        try
+        {
+            //obtenemos el tiempo para comprobar si lo ha superado
+            CargarDatosUsuario(guid);
+
+            //Si el tiempo nuevo es mayor que en la base de datos
+            //guardamos el tiempo y actualizamos
+            //Si es menor, actualizamos solo las monedas
+            if (Double.Parse(tiempo) > Double.Parse(respuesta))
+            {
+                query = "UPDATE datosjugador" +
+                    " SET Monedas = " + monedas +
+                    ",Tiempo = " + tiempo + 
+                    " WHERE Guid like '"+ guid +"';";
+
+                cmd = new MySqlCommand(query, conexion);
+
+                conexion.Open();
+                cmd.ExecuteNonQuery();
+                Debug.Log("Se han actualizado los datos(1) con exito");
+                conexion.Close();
+            }
+            else
+            {
+                query = "UPDATE datosjugador" +
+                    " SET Monedas = " + monedas +
+                    " WHERE Guid like '" + guid + "';";
+
+                cmd = new MySqlCommand(query, conexion);
+
+                conexion.Open();
+                cmd.ExecuteNonQuery();
+                Debug.Log("Se han actualizado los datos(2) con exito");
+                conexion.Close();
+            }
+        }
+        catch (MySqlException ex)
+        {
+            Debug.Log("Error al actualizar datos: "+ex);
+            cmd.Cancel();
+            conexion.Close();
+        }
+    }//ActualizarDatos();
 
     /// <summary>
     /// Eliminar datos del usuario
     /// </summary>
     /// <param name="guid"></param>
-    public void EliminarDatos(string guid)
+    public void EliminarDatos(string GuidText)
     {
+        try
+        {
+            CargarDatosUsuario(GuidText);
 
-    }
+            if (guidCargado.Equals(GuidText) && ComprobarGuid(GuidText, out respuesta))
+            {
+                query = "DELETE FROM datosjugador WHERE Guid like '" + guidCargado + "';";
+
+                conexion = new MySqlConnection(cadenaConexion);
+
+                cmd = new MySqlCommand(query, conexion);
+
+                conexion.Open();
+                cmd.ExecuteNonQuery();
+                Debug.Log("Se han borrado los datos con exito");
+                conexion.Close();
+            }
+        }
+        catch (MySqlException ex)
+        {
+            Debug.Log("Error al borrar datos: "+ex);
+            cmd.Cancel();
+            conexion.Close();
+        }
+    }//EliminarDatos();
 
     #endregion
 
@@ -132,22 +238,14 @@ public class SqlServer : MonoBehaviour
     public bool ComprobarGuid(string guid, out string respuesta)
     {
         respuesta = "";
-        query = "SELECT Guid FROM datosjugador WHERE Guid like '" + guid + "'";
 
         try
         {
-            conexion = new MySqlConnection(cadenaConexion);
-            cmd = new MySqlCommand(query, conexion);
+            CargarDatosUsuario(guid);
 
-            conexion.Open();
-            adaptador = new MySqlDataAdapter(query, conexion);
-            dt = new DataTable();
-
-            adaptador.Fill(dt);
-
-            if (dt.Rows.Count > 0)
+            if (!String.IsNullOrEmpty(guidCargado))
             {
-                respuesta = dt.Rows[0]["Guid"].ToString();
+                respuesta = guidCargado;
                 return true;
             }
 

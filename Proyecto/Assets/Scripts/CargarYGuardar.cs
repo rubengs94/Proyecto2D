@@ -11,13 +11,14 @@ public class CargarYGuardar : MonoBehaviour
     SqlServer sql;
     ControlPuntuacion controlpuntuacion;
     private JsonData itemData;
-    private String jsonText;
+    private string jsonText;
     //variables de usuario
     private string guid;
     public InputField nombre;
     //private int monedas;
     //private double tiempo;
     private string rutaPath;
+    private string respuesta;
 
     #endregion
 
@@ -31,36 +32,90 @@ public class CargarYGuardar : MonoBehaviour
     /// </summary>
     public void Guardar()
     {
-
-        SqlServer prueba = new SqlServer();
-
-        if (!File.Exists(rutaPath))
+        try
         {
-            //guardado en Json
-            guid = prueba.GenerarGuid();
+            sql = new SqlServer();
 
-            GuardarGuid guidJson = new GuardarGuid(guid, nombre.text);
-            itemData = JsonMapper.ToJson(guidJson);
-            //Cambiar ruta datapath por persistentdatapath
-            File.WriteAllText(rutaPath, itemData.ToString());
-            
-            Debug.Log(JsonUtility.ToJson(guidJson));
+            if (!File.Exists(rutaPath))
+            {
+                guid = sql.GenerarGuid();
+
+                GuardarGuid guidJson = new GuardarGuid(guid, nombre.text);
+                itemData = JsonMapper.ToJson(guidJson);
+                //Cambiar ruta datapath por persistentdatapath
+                File.WriteAllText(rutaPath, itemData.ToString());
+
+                Debug.Log("Json creado correctamente");
+            }
+            //else
+            //{
+            //    ///lectura de datos del archivo Json
+            //    jsonText = File.ReadAllText(rutaPath);
+            //    itemData = JsonMapper.ToObject(jsonText);
+
+            //    guid = itemData[0]["guid"].ToString();
+            //    nombre.text = itemData[0]["nombre"].ToString();
+
+            //    ///sistema de monedas y tiempo en controlpuntuacion
+
+
+            //    //guardado en BD
+            //    //sql.InsertarDatos(guid, nombre.text, monedas, tiempo);
+            //}
         }
-        else
+        catch(Exception ex)
         {
-            ///sistema de monedas y tiempo en controlpuntuacion
+            Debug.Log("Error sin determinar: "+ex);
+        }
+    }//Guardar()
 
-            ///lectura de datos del archivo Json
+
+    /// <summary>
+    /// Cargar datos del usuario
+    /// </summary>
+    public void Cargar()
+    {
+
+    }//Cargar()
+
+
+    /// <summary>
+    /// Actualizar monedas y tiempo del usuario
+    /// </summary>
+    public void actualizarDatos()
+    {
+        ///cargamos las monedas y el tiempo de
+        ///controlpuntuacion y los guardamos
+
+        sql = new SqlServer();
+
+        
+
+
+
+    }
+
+
+    /// <summary>
+    /// Metodo para eliminar datos del usuario
+    /// </summary>
+    public void EliminarDatos()
+    {
+        sql = new SqlServer();
+
+        if (File.Exists(rutaPath))
+        {
             jsonText = File.ReadAllText(rutaPath);
             itemData = JsonMapper.ToObject(jsonText);
 
             guid = itemData[0]["guid"].ToString();
-            nombre.text = itemData[0]["nombre"].ToString();
 
-            //guardado en BD
-            //prueba.InsertarDatos(guid, nombre.text, monedas, tiempo);
+            sql.EliminarDatos(guid);
         }
-    }
+    }//EliminarDatos()
+
+
+
 
     #region CLASESUSUARIO
     /// <summary>
