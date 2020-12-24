@@ -8,8 +8,8 @@ public class SqlServer : MonoBehaviour
 {
 
     #region PROPIEDADES
+
     String cadenaConexion = "Server=localhost;Database=servidorjuego;Uid=root;Pwd=";
-    //private string  server,port,user,password,bd;
     MySqlConnection conexion = null;
     MySqlCommand cmd;
     MySqlDataAdapter adaptador;
@@ -17,11 +17,13 @@ public class SqlServer : MonoBehaviour
     DataTable dt;
     DataRow dr;
     string query;
+    string respuesta;
+
     #endregion
 
 
     /// <summary>
-    /// Constructor parametrizado
+    /// Constructor vacio
     /// </summary>
     public SqlServer()
     {
@@ -34,8 +36,9 @@ public class SqlServer : MonoBehaviour
     /// <summary>
     /// Obtener informacion del usuario
     /// </summary>
-    public void ObtenerUsuario()
+    public void CargarDatosUsuario(string guid)
     {
+
     }
 
     /// <summary>
@@ -45,11 +48,11 @@ public class SqlServer : MonoBehaviour
     /// <param name="nombre">Nombre del usuario</param>
     /// <param name="monedas">Monedas en la cuenta</param>
     /// <param name="tiempo">Tiempo record del juego</param>
-    public void InsertarDatos(string nombre, int monedas, double tiempo)
+    public void InsertarDatos(string guid, string nombre, int monedas, double tiempo)
     {
         try
         {
-            query = "INSERT INTO datosjugador(Guid, Nombre, Monedas, Tiempo)VALUES('"+GenerarGuid()+"','"+nombre+"',"+monedas+","+tiempo+");";
+            query = "INSERT INTO datosjugador(Guid, Nombre, Monedas, Tiempo)VALUES('"+guid+"','"+nombre+"',"+monedas+","+tiempo+");";
 
             conexion = new MySqlConnection(cadenaConexion);
 
@@ -85,7 +88,7 @@ public class SqlServer : MonoBehaviour
     /// Eliminar datos del usuario
     /// </summary>
     /// <param name="guid"></param>
-    public void EliminarDatos(Guid guid)
+    public void EliminarDatos(string guid)
     {
 
     }
@@ -98,12 +101,12 @@ public class SqlServer : MonoBehaviour
     /// Generamos un Guid de tipo String
     /// </summary>
     /// <returns>Devuelve un String de tamaño 13</returns>
-    public String GenerarGuid()
+    public string GenerarGuid()
     {
         string nuevoGuid = Guid.NewGuid().ToString().Substring(0,13);
         try
         {
-            if (!ComprobarGuid(nuevoGuid))
+            if (!ComprobarGuid(nuevoGuid, out respuesta))
             {
                 Debug.Log("Guid creado correctamente");
                 return nuevoGuid;
@@ -121,9 +124,14 @@ public class SqlServer : MonoBehaviour
         return Guid.Empty.ToString(); ;
     }
    
-
-    public bool ComprobarGuid(String guid)
+    /// <summary>
+    /// Comprobar si existe el guid en la base de datos
+    /// </summary>
+    /// <param name="guid"></param>
+    /// <returns></returns>
+    public bool ComprobarGuid(string guid, out string respuesta)
     {
+        respuesta = "";
         query = "SELECT Guid FROM datosjugador WHERE Guid like '" + guid + "'";
 
         try
@@ -139,6 +147,7 @@ public class SqlServer : MonoBehaviour
 
             if (dt.Rows.Count > 0)
             {
+                respuesta = dt.Rows[0]["Guid"].ToString();
                 return true;
             }
 
