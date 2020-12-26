@@ -11,14 +11,13 @@ public class SqlServer : MonoBehaviour
 
     #region PROPIEDADES
 
-    String cadenaConexion = "Server=localhost;Database=servidorjuego;Uid=root;Pwd=";
-    MySqlConnection conexion = null;
+    static readonly string cadenaConexion = "Server=localhost;Database=servidorjuego;Uid=root;Pwd=";
+    static MySqlConnection conexion = new MySqlConnection(cadenaConexion);
+    static readonly string rutaPath = Application.dataPath + "/Guid.json";
+    LogExcepciones control;
     MySqlCommand cmd;
     MySqlDataAdapter adaptador;
-    DataSet ds;
     DataTable dt;
-    DataRow dr;
-    private string rutaPath;
     string query;
     string respuesta;
     string jsonText;
@@ -41,7 +40,6 @@ public class SqlServer : MonoBehaviour
 
     private void Awake()
     {
-        rutaPath = Application.dataPath + "/Guid.json";
     }
 
     #region MANEJO DE DATOS
@@ -51,7 +49,6 @@ public class SqlServer : MonoBehaviour
     /// </summary>
     public void CargarDatosUsuario(string guid)
     {
-
         try
         {
             query = "SELECT * FROM datosjugador WHERE Guid like '"+ guid +"';";
@@ -69,13 +66,13 @@ public class SqlServer : MonoBehaviour
             monedasCargadas = int.Parse(dt.Rows[0]["Monedas"].ToString());
             tiempoCargado = Double.Parse(dt.Rows[0]["Tiempo"].ToString());
 
-            Debug.Log("Se han cargado los datos con exito");
+            control.Publicar("Carga de datos correcta",DateTime.UtcNow, "Log");
             conexion.Close();
 
         }
         catch (MySqlException ex)
         {
-            Debug.Log("Error al cargar los datos: " + ex);
+            control.Publicar(ex.ToString(), DateTime.UtcNow, "Excepciones");
             cmd.Cancel();
             conexion.Close();
         }
@@ -90,23 +87,22 @@ public class SqlServer : MonoBehaviour
     /// <param name="tiempo">Tiempo record del juego</param>
     public void InsertarDatos(string guid, string nombre, int monedas, double tiempo)
     {
+
         try
         {
             query = "INSERT INTO datosjugador(Guid, Nombre, Monedas, Tiempo)VALUES('"+guid+"','"+nombre+"',"+monedas+","+tiempo+");";
-
-            conexion = new MySqlConnection(cadenaConexion);
 
             cmd = new MySqlCommand(query, conexion);
 
             conexion.Open();
             cmd.ExecuteNonQuery();
-            Debug.Log("Se han insertado los datos con exito");
+            control.Publicar("El usuario '"+guid+"' con nombre '"+nombre+"' se ha insertado correctamente", DateTime.UtcNow, "Log");
             conexion.Close();
             
         }
         catch (MySqlException ex)
         {
-            Debug.Log("Error al insertar datos: "+ex);
+            control.Publicar(ex.ToString(), DateTime.UtcNow, "Excepciones");
             cmd.Cancel();
             conexion.Close();
         }
@@ -119,9 +115,8 @@ public class SqlServer : MonoBehaviour
     /// <param name="tiempo"></param>
     public void ActualizarDatos(int monedas, string tiempo)
     {
-        jsonText = File.ReadAllText(rutaPath);
-        itemData = JsonMapper.ToObject(jsonText);
-        string guid = itemData[0]["guid"].ToString();
+
+        string guid = LeerGuidJson();
 
         try
         {
@@ -131,7 +126,7 @@ public class SqlServer : MonoBehaviour
             //Si el tiempo nuevo es mayor que en la base de datos
             //guardamos el tiempo y actualizamos
             //Si es menor, actualizamos solo las monedas
-            if (Double.Parse(tiempo) > Double.Parse(respuesta))
+            if (Double.Parse(tiempo) > tiempoCargado)
             {
                 query = "UPDATE datosjugador" +
                     " SET Monedas = " + monedas +
@@ -142,7 +137,7 @@ public class SqlServer : MonoBehaviour
 
                 conexion.Open();
                 cmd.ExecuteNonQuery();
-                Debug.Log("Se han actualizado los datos(1) con exito");
+                control.Publicar("Los datos del usuario '"+guid+"' se han actualizado correctamente", DateTime.UtcNow, "Log");
                 conexion.Close();
             }
             else
@@ -155,13 +150,13 @@ public class SqlServer : MonoBehaviour
 
                 conexion.Open();
                 cmd.ExecuteNonQuery();
-                Debug.Log("Se han actualizado los datos(2) con exito");
+                control.Publicar("Carga de datos correcta", DateTime.UtcNow, "Log");
                 conexion.Close();
             }
         }
         catch (MySqlException ex)
         {
-            Debug.Log("Error al actualizar datos: "+ex);
+            control.Publicar(ex.ToString(), DateTime.UtcNow, "Excepciones");
             cmd.Cancel();
             conexion.Close();
         }
@@ -171,13 +166,15 @@ public class SqlServer : MonoBehaviour
     /// Eliminar datos del usuario
     /// </summary>
     /// <param name="guid"></param>
-    public void EliminarDatos(string GuidText)
+    public void EliminarDatos()
     {
+        string guidJson = LeerGuidJson();
+
         try
         {
-            CargarDatosUsuario(GuidText);
+            CargarDatosUsuario(guidJson);
 
-            if (guidCargado.Equals(GuidText) && ComprobarGuid(GuidText, out respuesta))
+            if (guidCargado.Equals(guidJson) && ComprobarGuid(guidJson))
             {
                 query = "DELETE FROM datosjugador WHERE Guid like '" + guidCargado + "';";
 
@@ -187,13 +184,13 @@ public class SqlServer : MonoBehaviour
 
                 conexion.Open();
                 cmd.ExecuteNonQuery();
-                Debug.Log("Se han borrado los datos con exito");
+                control.Publicar("Se han eliminado los datos del usuario '"+guidCargado+"'", DateTime.UtcNow, "Log");
                 conexion.Close();
             }
         }
         catch (MySqlException ex)
         {
-            Debug.Log("Error al borrar datos: "+ex);
+            control.Publicar(ex.ToString(), DateTime.UtcNow, "Excepciones");
             cmd.Cancel();
             conexion.Close();
         }
@@ -209,12 +206,13 @@ public class SqlServer : MonoBehaviour
     /// <returns>Devuelve un String de tamaño 13</returns>
     public string GenerarGuid()
     {
+
         string nuevoGuid = Guid.NewGuid().ToString().Substring(0,13);
         try
         {
-            if (!ComprobarGuid(nuevoGuid, out respuesta))
+            if (!ComprobarGuid(nuevoGuid))
             {
-                Debug.Log("Guid creado correctamente");
+                control.Publicar("Guid generado correctamente", DateTime.UtcNow, "Log");
                 return nuevoGuid;
             }
             else
@@ -224,7 +222,7 @@ public class SqlServer : MonoBehaviour
         }
         catch (MySqlException ex)
         {
-            Debug.Log("Error al crear el Guid: " + ex);
+            control.Publicar(ex.ToString(), DateTime.UtcNow, "Excepciones");
         }
 
         return Guid.Empty.ToString(); ;
@@ -235,9 +233,8 @@ public class SqlServer : MonoBehaviour
     /// </summary>
     /// <param name="guid"></param>
     /// <returns></returns>
-    public bool ComprobarGuid(string guid, out string respuesta)
+    public bool ComprobarGuid(string guid)
     {
-        respuesta = "";
 
         try
         {
@@ -245,7 +242,6 @@ public class SqlServer : MonoBehaviour
 
             if (!String.IsNullOrEmpty(guidCargado))
             {
-                respuesta = guidCargado;
                 return true;
             }
 
@@ -254,7 +250,7 @@ public class SqlServer : MonoBehaviour
         }
         catch (MySqlException ex)
         {
-            Debug.Log("Error al comprobar Guid: " + ex);
+            control.Publicar(ex.ToString(), DateTime.UtcNow, "Excepciones");
             cmd.Cancel();
             conexion.Close();
         }
@@ -262,6 +258,18 @@ public class SqlServer : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Devolvemos el guid del Json
+    /// </summary>
+    /// <returns></returns>
+    public string LeerGuidJson()
+    {
+        jsonText = File.ReadAllText(rutaPath);
+        itemData = JsonMapper.ToObject(jsonText);
+        string guid = itemData[0]["guid"].ToString();
+
+        return guid;
+    }
 
     #endregion
 }

@@ -105,12 +105,11 @@ public class CargarYGuardar : MonoBehaviour
 
         if (File.Exists(rutaPath))
         {
-            jsonText = File.ReadAllText(rutaPath);
-            itemData = JsonMapper.ToObject(jsonText);
-
-            guid = itemData[0]["guid"].ToString();
-
-            sql.EliminarDatos(guid);
+            sql.EliminarDatos();
+        }
+        else
+        {
+            
         }
     }//EliminarDatos()
 
