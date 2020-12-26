@@ -4,13 +4,10 @@ using System;
 using System.Data;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SqlServer : MonoBehaviour
 {
-    /// <summary>
-    /// Constructor vacio
-    /// </summary>
-    public SqlServer(){}
 
     #region PROPIEDADES
 
@@ -22,15 +19,17 @@ public class SqlServer : MonoBehaviour
     DataTable dt;
     string query;
     string jsonText;
+    CargarYGuardar cargaryguardar;
     private JsonData itemData;
-    private string guidCargado;
-    private string nombreCargado;
-    private int monedasCargadas;
-    private double tiempoCargado;
+    public string GuidCargado { get; set; }
+    public string NombreCargado { get; set; }
+    public int MonedasCargadas { get; set; }
+    public double TiempoCargado { get; set; }
 
     #endregion
 
 
+    
     #region MANEJO DE DATOS
 
     /// <summary>
@@ -52,11 +51,11 @@ public class SqlServer : MonoBehaviour
 
             if (dt.Rows.Count > 0)
             {
-                guidCargado = dt.Rows[0]["Guid"].ToString();
-                nombreCargado = dt.Rows[0]["Nombre"].ToString();
-                monedasCargadas = int.Parse(dt.Rows[0]["Monedas"].ToString());
-                tiempoCargado = Double.Parse(dt.Rows[0]["Tiempo"].ToString());
-                Publicar("Carga de datos correcta", "Log");
+                GuidCargado = dt.Rows[0]["Guid"].ToString();
+                NombreCargado = dt.Rows[0]["Nombre"].ToString();
+                MonedasCargadas = int.Parse(dt.Rows[0]["Monedas"].ToString());
+                TiempoCargado = Double.Parse(dt.Rows[0]["Tiempo"].ToString());
+                Publicar(Codes.UsuarioCargado.ToString() + "///"+GuidCargado, "Log");
             }
 
             conexion.Close();
@@ -64,9 +63,9 @@ public class SqlServer : MonoBehaviour
         }
         catch (MySqlException ex)
         {
-            Publicar(guidCargado+Errores.ErrorAlCargar.ToString()+ex.ToString(), "Excepciones");
             cmd.Cancel();
             conexion.Close();
+            Publicar(GuidCargado+Codes.ErrorAlCargar.ToString()+ex.ToString(), "Excepcion");
         }
     }//CargarDatosUsuario();
 
@@ -90,14 +89,14 @@ public class SqlServer : MonoBehaviour
             cmd.ExecuteNonQuery();
             conexion.Close();
 
-            Publicar("El usuario " + guid + " con nombre " + nombre + " se ha insertado correctamente", "Log");
+            Publicar(Codes.UsuarioCreado.ToString() + "///" +guid+"///"+nombre, "Log");
             
         }
         catch (MySqlException ex)
         {
-            Publicar(guid+Errores.ErrorAlInsertar.ToString()+ex.ToString(), "Excepciones");
             cmd.Cancel();
             conexion.Close();
+            Publicar(guid+Codes.ErrorAlInsertar.ToString()+ex.ToString(), "Excepcion");
         }
     }//InsertarDatos();
 
@@ -119,7 +118,7 @@ public class SqlServer : MonoBehaviour
             //Si el tiempo nuevo es mayor que en la base de datos
             //guardamos el tiempo y actualizamos
             //Si es menor, actualizamos solo las monedas
-            if (Double.Parse(tiempo) > tiempoCargado)
+            if (Double.Parse(tiempo) > TiempoCargado)
             {
                 query = "UPDATE datosjugador" +
                     " SET Monedas = " + monedas +
@@ -132,7 +131,7 @@ public class SqlServer : MonoBehaviour
                 cmd.ExecuteNonQuery();
                 conexion.Close();
 
-                Publicar("Los datos del usuario "+guid+" se han actualizado correctamente", "Log");
+                Publicar(Codes.UsuarioActualizado.ToString() + "///" +guid, "Log");
             }
             else
             {
@@ -146,14 +145,14 @@ public class SqlServer : MonoBehaviour
                 cmd.ExecuteNonQuery();
                 conexion.Close();
 
-                Publicar("Carga de datos correcta", "Log");
+                Publicar(Codes.UsuarioActualizado.ToString()+"///"+guid, "Log");
             }
         }
         catch (MySqlException ex)
         {
-            Publicar(guidCargado+Errores.ErrorAlActualizar.ToString()+ex.ToString(), "Excepciones");
             cmd.Cancel();
             conexion.Close();
+            Publicar(GuidCargado+Codes.ErrorAlActualizar.ToString()+ex.ToString(), "Excepcion");
         }
     }//ActualizarDatos();
 
@@ -169,9 +168,13 @@ public class SqlServer : MonoBehaviour
         {
             CargarDatosUsuario(guidJson);
 
-            if (guidCargado.Equals(guidJson) && ComprobarGuid(guidJson))
+            if (GuidCargado.Equals(guidJson) && ComprobarGuid(guidJson))
             {
-                query = "DELETE FROM datosjugador WHERE Guid like '" + guidCargado + "';";
+
+                File.Delete(rutaPath);
+                File.Delete(rutaPath+".meta");
+
+                query = "DELETE FROM datosjugador WHERE Guid like '" + GuidCargado + "';";
 
                 conexion = new MySqlConnection(cadenaConexion);
 
@@ -181,14 +184,16 @@ public class SqlServer : MonoBehaviour
                 cmd.ExecuteNonQuery();
                 conexion.Close();
 
-                Publicar("Se han eliminado los datos del usuario "+guidCargado, "Log");
+                Publicar(Codes.UsuarioEliminado.ToString()+"///"+GuidCargado, "Log");
+
+                SceneManager.LoadScene("MenuPrincipal");
             }
         }
         catch (MySqlException ex)
         {
-            Publicar(guidCargado+Errores.ErrorAlEliminar.ToString()+ex.ToString(), "Excepciones");
             cmd.Cancel();
             conexion.Close();
+            Publicar(GuidCargado+Codes.ErrorAlEliminar.ToString()+ex.ToString(), "Excepcion");
         }
     }//EliminarDatos();
 
@@ -197,10 +202,14 @@ public class SqlServer : MonoBehaviour
 
     #region LOG/EXCEPCIONES
 
-    public enum Errores
+    public enum Codes
     {
         SinDeterminar,
-        AliasEnUso,
+        Log_Excepcion,
+        UsuarioCreado,
+        UsuarioActualizado,
+        UsuarioEliminado,
+        UsuarioCargado,
         ErrorAlGuardar,
         ErrorAlInsertar,
         ErrorAlActualizar,
@@ -226,13 +235,13 @@ public class SqlServer : MonoBehaviour
             conexion.Open();
             cmd.ExecuteNonQuery();
             conexion.Close();
-            Debug.Log("Se han insertado los datos con exito");
+            Debug.Log(Codes.Log_Excepcion.ToString() + "///" +tipo);
         }
         catch (MySqlException ex)
         {
-            Debug.Log("Error al insertar el error: " + ex);
             cmd.Cancel();
             conexion.Close();
+            Debug.Log("Error al insertar el log/excepcion: " + ex);
         }
 
     }
@@ -282,7 +291,7 @@ public class SqlServer : MonoBehaviour
         {
             CargarDatosUsuario(guid);
 
-            if (!String.IsNullOrEmpty(guidCargado))
+            if (!String.IsNullOrEmpty(GuidCargado))
             {
                 return true;
             }
@@ -292,9 +301,9 @@ public class SqlServer : MonoBehaviour
         }
         catch (MySqlException ex)
         {
-            Publicar(ex.ToString(), "Excepciones");
             cmd.Cancel();
             conexion.Close();
+            Publicar(ex.ToString(), "Excepciones");
         }
 
         return false;
@@ -308,7 +317,7 @@ public class SqlServer : MonoBehaviour
     {
         jsonText = File.ReadAllText(rutaPath);
         itemData = JsonMapper.ToObject(jsonText);
-        string guid = itemData[0]["guid"].ToString();
+        string guid = itemData["guid"].ToString();
 
         return guid;
     }

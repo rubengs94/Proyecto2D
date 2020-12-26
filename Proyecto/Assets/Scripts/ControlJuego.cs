@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
+using LitJson;
+using System.IO;
 
 public class ControlJuego : MonoBehaviour, IPointerClickHandler
 {
     #region PROPIEDADES
 
+    private JsonData itemData;
+    private string jsonText;
     public new AudioSource audio;
     public Sprite imagenAudioOn;
     public Sprite imagenAudioOff;

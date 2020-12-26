@@ -15,12 +15,19 @@ public class CargarYGuardar : MonoBehaviour
     //variables de usuario
     private string guid;
     public InputField nombre;
+    public Text monedas;
+    public Button eliminar;
     //private int monedas;
     //private double tiempo;
     private string rutaPath;
     private string respuesta;
 
     #endregion
+
+    private void Start()
+    {
+        Cargar();
+    }
 
     private void Awake()
     {
@@ -38,34 +45,23 @@ public class CargarYGuardar : MonoBehaviour
 
             if (!File.Exists(rutaPath))
             {
+
                 guid = sql.GenerarGuid();
+                sql.InsertarDatos(guid, nombre.text, 0, 0.0);
 
                 GuardarGuid guidJson = new GuardarGuid(guid);
                 itemData = JsonMapper.ToJson(guidJson);
                 //Cambiar ruta datapath por persistentdatapath
                 File.WriteAllText(rutaPath, itemData.ToString());
 
-                sql.InsertarDatos(guid, nombre.text, 0, 0.0);
 
                 Debug.Log("Json creado correctamente");
             }
-            else
-            {
-                ///lectura de datos del archivo Json
-                jsonText = File.ReadAllText(rutaPath);
-                itemData = JsonMapper.ToObject(jsonText);
-
-                guid = itemData[0]["guid"].ToString();
-
-                ///sistema de monedas y tiempo en controlpuntuacion
-                sql.CargarDatosUsuario(guid);
-
-               
-            }
+            
         }
         catch(Exception ex)
         {
-            sql.Publicar(SqlServer.Errores.ErrorAlGuardar.ToString()+ex.ToString(), "Excepciones");
+            sql.Publicar(SqlServer.Codes.ErrorAlGuardar.ToString()+ex.ToString(), "Excepciones");
         }
     }//Guardar()
 
@@ -75,7 +71,31 @@ public class CargarYGuardar : MonoBehaviour
     /// </summary>
     public void Cargar()
     {
+        sql = new SqlServer();
 
+        if (File.Exists(rutaPath))
+        {
+            jsonText = File.ReadAllText(rutaPath);
+            itemData = JsonMapper.ToObject(jsonText);
+            string guid = itemData["guid"].ToString();
+
+            sql.CargarDatosUsuario(guid);
+
+            if (!String.IsNullOrEmpty(sql.NombreCargado))
+            {
+                eliminar.enabled = true;
+                nombre.interactable = false;
+                nombre.text = sql.NombreCargado;
+                monedas.text = "Monedas: "+sql.MonedasCargadas.ToString();
+                monedas.GetComponent<Text>().enabled = true;
+            }
+        }
+        else
+        {
+            eliminar.enabled = false;
+            monedas.GetComponent<Text>().enabled = false;
+            //goMonedas.SetActive(false);
+        }
     }//Cargar()
 
 
@@ -88,10 +108,6 @@ public class CargarYGuardar : MonoBehaviour
         ///controlpuntuacion y los guardamos
 
         sql = new SqlServer();
-
-        
-
-
 
     }
 
@@ -106,10 +122,6 @@ public class CargarYGuardar : MonoBehaviour
         if (File.Exists(rutaPath))
         {
             sql.EliminarDatos();
-        }
-        else
-        {
-            
         }
     }//EliminarDatos()
 
