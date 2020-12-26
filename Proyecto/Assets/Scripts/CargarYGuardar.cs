@@ -40,32 +40,32 @@ public class CargarYGuardar : MonoBehaviour
             {
                 guid = sql.GenerarGuid();
 
-                GuardarGuid guidJson = new GuardarGuid(guid, nombre.text);
+                GuardarGuid guidJson = new GuardarGuid(guid);
                 itemData = JsonMapper.ToJson(guidJson);
                 //Cambiar ruta datapath por persistentdatapath
                 File.WriteAllText(rutaPath, itemData.ToString());
 
+                sql.InsertarDatos(guid, nombre.text, 0, 0.0);
+
                 Debug.Log("Json creado correctamente");
             }
-            //else
-            //{
-            //    ///lectura de datos del archivo Json
-            //    jsonText = File.ReadAllText(rutaPath);
-            //    itemData = JsonMapper.ToObject(jsonText);
+            else
+            {
+                ///lectura de datos del archivo Json
+                jsonText = File.ReadAllText(rutaPath);
+                itemData = JsonMapper.ToObject(jsonText);
 
-            //    guid = itemData[0]["guid"].ToString();
-            //    nombre.text = itemData[0]["nombre"].ToString();
+                guid = itemData[0]["guid"].ToString();
 
-            //    ///sistema de monedas y tiempo en controlpuntuacion
+                ///sistema de monedas y tiempo en controlpuntuacion
+                sql.CargarDatosUsuario(guid);
 
-
-            //    //guardado en BD
-            //    //sql.InsertarDatos(guid, nombre.text, monedas, tiempo);
-            //}
+               
+            }
         }
         catch(Exception ex)
         {
-            Debug.Log("Error sin determinar: "+ex);
+            sql.Publicar(SqlServer.Errores.ErrorAlGuardar.ToString()+ex.ToString(), "Excepciones");
         }
     }//Guardar()
 
@@ -142,13 +142,11 @@ public class CargarYGuardar : MonoBehaviour
     [Serializable]
     public class GuardarGuid
     {
-        string guid;
-        string nombre;
+        public string guid;
 
-        public GuardarGuid(string guid,string nombre)
+        public GuardarGuid(string guid)
         {
             this.guid = guid;
-            this.nombre = nombre;
         }
     }
 

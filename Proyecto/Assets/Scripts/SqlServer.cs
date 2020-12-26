@@ -1,25 +1,26 @@
-﻿using MySql.Data.MySqlClient;
+﻿using LitJson;
+using MySql.Data.MySqlClient;
 using System;
-using LitJson;
 using System.Data;
-using System.Data.Common;
-using UnityEngine;
 using System.IO;
+using UnityEngine;
 
 public class SqlServer : MonoBehaviour
 {
+    /// <summary>
+    /// Constructor vacio
+    /// </summary>
+    public SqlServer(){}
 
     #region PROPIEDADES
 
     static readonly string cadenaConexion = "Server=localhost;Database=servidorjuego;Uid=root;Pwd=";
     static MySqlConnection conexion = new MySqlConnection(cadenaConexion);
     static readonly string rutaPath = Application.dataPath + "/Guid.json";
-    LogExcepciones control;
     MySqlCommand cmd;
     MySqlDataAdapter adaptador;
     DataTable dt;
     string query;
-    string respuesta;
     string jsonText;
     private JsonData itemData;
     private string guidCargado;
@@ -29,18 +30,6 @@ public class SqlServer : MonoBehaviour
 
     #endregion
 
-
-    /// <summary>
-    /// Constructor vacio
-    /// </summary>
-    public SqlServer()
-    {
-
-    }
-
-    private void Awake()
-    {
-    }
 
     #region MANEJO DE DATOS
 
@@ -61,18 +50,21 @@ public class SqlServer : MonoBehaviour
             dt = new DataTable();
             adaptador.Fill(dt);
 
-            guidCargado = dt.Rows[0]["Guid"].ToString();
-            nombreCargado = dt.Rows[0]["Nombre"].ToString();
-            monedasCargadas = int.Parse(dt.Rows[0]["Monedas"].ToString());
-            tiempoCargado = Double.Parse(dt.Rows[0]["Tiempo"].ToString());
+            if (dt.Rows.Count > 0)
+            {
+                guidCargado = dt.Rows[0]["Guid"].ToString();
+                nombreCargado = dt.Rows[0]["Nombre"].ToString();
+                monedasCargadas = int.Parse(dt.Rows[0]["Monedas"].ToString());
+                tiempoCargado = Double.Parse(dt.Rows[0]["Tiempo"].ToString());
+                Publicar("Carga de datos correcta", "Log");
+            }
 
-            control.Publicar("Carga de datos correcta",DateTime.UtcNow, "Log");
             conexion.Close();
 
         }
         catch (MySqlException ex)
         {
-            control.Publicar(ex.ToString(), DateTime.UtcNow, "Excepciones");
+            Publicar(guidCargado+Errores.ErrorAlCargar.ToString()+ex.ToString(), "Excepciones");
             cmd.Cancel();
             conexion.Close();
         }
@@ -96,13 +88,14 @@ public class SqlServer : MonoBehaviour
 
             conexion.Open();
             cmd.ExecuteNonQuery();
-            control.Publicar("El usuario '"+guid+"' con nombre '"+nombre+"' se ha insertado correctamente", DateTime.UtcNow, "Log");
             conexion.Close();
+
+            Publicar("El usuario " + guid + " con nombre " + nombre + " se ha insertado correctamente", "Log");
             
         }
         catch (MySqlException ex)
         {
-            control.Publicar(ex.ToString(), DateTime.UtcNow, "Excepciones");
+            Publicar(guid+Errores.ErrorAlInsertar.ToString()+ex.ToString(), "Excepciones");
             cmd.Cancel();
             conexion.Close();
         }
@@ -137,8 +130,9 @@ public class SqlServer : MonoBehaviour
 
                 conexion.Open();
                 cmd.ExecuteNonQuery();
-                control.Publicar("Los datos del usuario '"+guid+"' se han actualizado correctamente", DateTime.UtcNow, "Log");
                 conexion.Close();
+
+                Publicar("Los datos del usuario "+guid+" se han actualizado correctamente", "Log");
             }
             else
             {
@@ -150,13 +144,14 @@ public class SqlServer : MonoBehaviour
 
                 conexion.Open();
                 cmd.ExecuteNonQuery();
-                control.Publicar("Carga de datos correcta", DateTime.UtcNow, "Log");
                 conexion.Close();
+
+                Publicar("Carga de datos correcta", "Log");
             }
         }
         catch (MySqlException ex)
         {
-            control.Publicar(ex.ToString(), DateTime.UtcNow, "Excepciones");
+            Publicar(guidCargado+Errores.ErrorAlActualizar.ToString()+ex.ToString(), "Excepciones");
             cmd.Cancel();
             conexion.Close();
         }
@@ -184,19 +179,66 @@ public class SqlServer : MonoBehaviour
 
                 conexion.Open();
                 cmd.ExecuteNonQuery();
-                control.Publicar("Se han eliminado los datos del usuario '"+guidCargado+"'", DateTime.UtcNow, "Log");
                 conexion.Close();
+
+                Publicar("Se han eliminado los datos del usuario "+guidCargado, "Log");
             }
         }
         catch (MySqlException ex)
         {
-            control.Publicar(ex.ToString(), DateTime.UtcNow, "Excepciones");
+            Publicar(guidCargado+Errores.ErrorAlEliminar.ToString()+ex.ToString(), "Excepciones");
             cmd.Cancel();
             conexion.Close();
         }
     }//EliminarDatos();
 
     #endregion
+
+
+    #region LOG/EXCEPCIONES
+
+    public enum Errores
+    {
+        SinDeterminar,
+        AliasEnUso,
+        ErrorAlGuardar,
+        ErrorAlInsertar,
+        ErrorAlActualizar,
+        ErrorAlCargar,
+        ErrorAlEliminar,
+        ErrorEnElGuid
+    }
+
+    /// <summary>
+    /// Guardar log/excepciones en Base de Datos
+    /// </summary>
+    /// <param name="texto"></param>
+    /// <param name="tipo"></param>
+    public void Publicar(string texto, string tipo)
+    {
+        DateTime fecha = DateTime.Now;
+        fecha.ToString("yyyy-MM-dd H:mm:ss");
+        try
+        {
+            string query = "INSERT INTO " + tipo + "(ID,Texto, Fecha) VALUES(0,'" + texto + "','" + fecha + "');";
+
+            cmd = new MySqlCommand(query, conexion);
+            conexion.Open();
+            cmd.ExecuteNonQuery();
+            conexion.Close();
+            Debug.Log("Se han insertado los datos con exito");
+        }
+        catch (MySqlException ex)
+        {
+            Debug.Log("Error al insertar el error: " + ex);
+            cmd.Cancel();
+            conexion.Close();
+        }
+
+    }
+
+    #endregion
+
 
     #region GUID
 
@@ -212,7 +254,7 @@ public class SqlServer : MonoBehaviour
         {
             if (!ComprobarGuid(nuevoGuid))
             {
-                control.Publicar("Guid generado correctamente", DateTime.UtcNow, "Log");
+                Publicar("Guid generado correctamente", "Log");
                 return nuevoGuid;
             }
             else
@@ -222,7 +264,7 @@ public class SqlServer : MonoBehaviour
         }
         catch (MySqlException ex)
         {
-            control.Publicar(ex.ToString(), DateTime.UtcNow, "Excepciones");
+            Publicar(ex.ToString(), "Excepciones");
         }
 
         return Guid.Empty.ToString(); ;
@@ -250,7 +292,7 @@ public class SqlServer : MonoBehaviour
         }
         catch (MySqlException ex)
         {
-            control.Publicar(ex.ToString(), DateTime.UtcNow, "Excepciones");
+            Publicar(ex.ToString(), "Excepciones");
             cmd.Cancel();
             conexion.Close();
         }
@@ -273,55 +315,3 @@ public class SqlServer : MonoBehaviour
 
     #endregion
 }
-
-
-#region COMENTARIOS
-/*
- string connectionString = "datasource=127.0.0.1;port=3306;username=root;password=;database=test;";
-// Tu consulta en SQL
-string query = "SELECT * FROM user";
-
-// Prepara la conexión
-MySqlConnection databaseConnection = new MySqlConnection(connectionString);
-MySqlCommand commandDatabase = new MySqlCommand(query, databaseConnection);
-commandDatabase.CommandTimeout = 60;
-MySqlDataReader reader;
-
-// A consultar !
-try
-{
-    // Abre la base de datos
-    databaseConnection.Open();
-
-    // Ejecuta la consultas
-    reader = commandDatabase.ExecuteReader();
-
-    // Hasta el momento todo bien, es decir datos obtenidos
-
-    // IMPORTANTE :#
-    // Si tu consulta retorna un resultado, usa el siguiente proceso para obtener datos
-    
-    if (reader.HasRows)
-    {
-        while (reader.Read())
-        {
-            // En nuestra base de datos, el array contiene:  ID 0, FIRST_NAME 1,LAST_NAME 2, ADDRESS 3
-            // Hacer algo con cada fila obtenida
-            string[] row = { reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetString(3) };
-        }
-    }
-    else
-    {
-        Console.WriteLine("No se encontraron datos.");
-    }
-
-    // Cerrar la conexión
-    databaseConnection.Close();
-}
-catch (Exception ex)
-{
-    // Mostrar cualquier excepción
-    MessageBox.Show(ex.Message);
-}
-     */
-#endregion
