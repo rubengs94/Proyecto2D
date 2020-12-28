@@ -1,25 +1,28 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
+using LitJson;
+using System.IO;
 
 public class ControlJuego : MonoBehaviour, IPointerClickHandler
 {
     #region PROPIEDADES
-    public AudioSource audio;
+
+    private JsonData itemData;
+    private string jsonText;
+    public new AudioSource audio;
     public Sprite imagenAudioOn;
     public Sprite imagenAudioOff;
     public Button BotonAudio;
     public Escenas cargarEscena;
-    public enum Escenas
-    {
-        MenuPrincipal,
-        Nivel1,
-    }
+    public enum Escenas{ MenuPrincipal, Nivel1 }
+
     #endregion
 
     #region CambiarNivel
+
     /*
+     * ANTIGUO CAMBIO DE NIVEL
     public void CambiarNivel (int nivel)
     {
             switch (nivel)
@@ -35,6 +38,7 @@ public class ControlJuego : MonoBehaviour, IPointerClickHandler
     {
         PantallaDeCarga.Instancia.CargarEscena(cargarEscena.ToString());
     }
+
     #endregion
 
     #region Musica

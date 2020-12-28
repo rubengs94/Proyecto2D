@@ -1,42 +1,73 @@
-﻿using MySql.Data.MySqlClient;
+﻿using LitJson;
+using MySql.Data.MySqlClient;
 using System;
 using System.Data;
-using System.Data.Common;
+using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SqlServer : MonoBehaviour
 {
 
     #region PROPIEDADES
-    String cadenaConexion = "Server=localhost;Database=servidorjuego;Uid=root;Pwd=";
-    //private string  server,port,user,password,bd;
-    MySqlConnection conexion = null;
+
+    static readonly string cadenaConexion = "Server=localhost;Database=servidorjuego;Uid=root;Pwd=";
+    static MySqlConnection conexion = new MySqlConnection(cadenaConexion);
+    static readonly string rutaPath = Application.dataPath + "/Guid.json";
     MySqlCommand cmd;
     MySqlDataAdapter adaptador;
-    DataSet ds;
     DataTable dt;
-    DataRow dr;
     string query;
+    string jsonText;
+    CargarYGuardar cargaryguardar;
+    private JsonData itemData;
+    public string GuidCargado { get; set; }
+    public string NombreCargado { get; set; }
+    public int MonedasCargadas { get; set; }
+    public double TiempoCargado { get; set; }
+
     #endregion
 
 
-    /// <summary>
-    /// Constructor parametrizado
-    /// </summary>
-    public SqlServer()
-    {
-
-    }
-
-
+    
     #region MANEJO DE DATOS
 
     /// <summary>
     /// Obtener informacion del usuario
     /// </summary>
-    public void ObtenerUsuario()
+    public void CargarDatosUsuario(string guid)
     {
-    }
+        try
+        {
+            query = "SELECT * FROM datosjugador WHERE Guid like '"+ guid +"';";
+            cmd = new MySqlCommand(query, conexion);
+            conexion.Open();
+            cmd.ExecuteNonQuery();
+            conexion.Close();
+
+            adaptador = new MySqlDataAdapter(query, conexion);
+            dt = new DataTable();
+            adaptador.Fill(dt);
+
+            if (dt.Rows.Count > 0)
+            {
+                GuidCargado = dt.Rows[0]["Guid"].ToString();
+                NombreCargado = dt.Rows[0]["Nombre"].ToString();
+                MonedasCargadas = int.Parse(dt.Rows[0]["Monedas"].ToString());
+                TiempoCargado = Double.Parse(dt.Rows[0]["Tiempo"].ToString());
+                Publicar(Codes.UsuarioCargado.ToString() + "///"+GuidCargado, "Log");
+            }
+
+            conexion.Close();
+
+        }
+        catch (MySqlException ex)
+        {
+            cmd.Cancel();
+            conexion.Close();
+            Publicar(GuidCargado+Codes.ErrorAlCargar.ToString()+ex.ToString(), "Excepcion");
+        }
+    }//CargarDatosUsuario();
 
     /// <summary>
     /// Insertart datos del usuario
@@ -45,52 +76,178 @@ public class SqlServer : MonoBehaviour
     /// <param name="nombre">Nombre del usuario</param>
     /// <param name="monedas">Monedas en la cuenta</param>
     /// <param name="tiempo">Tiempo record del juego</param>
-    public void InsertarDatos(string nombre, int monedas, double tiempo)
+    public void InsertarDatos(string guid, string nombre, int monedas, double tiempo)
     {
+
         try
         {
-            query = "INSERT INTO datosjugador(Guid, Nombre, Monedas, Tiempo)VALUES('"+GenerarGuid()+"','"+nombre+"',"+monedas+","+tiempo+");";
-
-            conexion = new MySqlConnection(cadenaConexion);
+            query = "INSERT INTO datosjugador(Guid, Nombre, Monedas, Tiempo)VALUES('"+guid+"','"+nombre+"',"+monedas+","+tiempo+");";
 
             cmd = new MySqlCommand(query, conexion);
 
             conexion.Open();
             cmd.ExecuteNonQuery();
-            Debug.Log("Se han insertado los datos con exito");
             conexion.Close();
+
+            Publicar(Codes.UsuarioCreado.ToString() + "///" +guid+"///"+nombre, "Log");
             
         }
         catch (MySqlException ex)
         {
-            Debug.Log("Error al insertar datos: "+ex);
             cmd.Cancel();
             conexion.Close();
+            Publicar(guid+Codes.ErrorAlInsertar.ToString()+ex.ToString(), "Excepcion");
         }
-
-    }
+    }//InsertarDatos();
 
     /// <summary>
     /// Actualizar datos del usuario
     /// </summary>
-    /// <param name="nombre"></param>
     /// <param name="monedas"></param>
     /// <param name="tiempo"></param>
-    public void ActualizarDatos(string nombre, int monedas, string tiempo)
+    public void ActualizarDatos(int monedas, string tiempo)
     {
 
-    }
+        string guid = LeerGuidJson();
+
+        try
+        {
+            //obtenemos el tiempo para comprobar si lo ha superado
+            CargarDatosUsuario(guid);
+
+            //Si el tiempo nuevo es mayor que en la base de datos
+            //guardamos el tiempo y actualizamos
+            //Si es menor, actualizamos solo las monedas
+            if (Double.Parse(tiempo) > TiempoCargado)
+            {
+                query = "UPDATE datosjugador" +
+                    " SET Monedas = " + monedas +
+                    ",Tiempo = " + tiempo + 
+                    " WHERE Guid like '"+ guid +"';";
+
+                cmd = new MySqlCommand(query, conexion);
+
+                conexion.Open();
+                cmd.ExecuteNonQuery();
+                conexion.Close();
+
+                Publicar(Codes.UsuarioActualizado.ToString() + "///" +guid, "Log");
+            }
+            else
+            {
+                query = "UPDATE datosjugador" +
+                    " SET Monedas = " + monedas +
+                    " WHERE Guid like '" + guid + "';";
+
+                cmd = new MySqlCommand(query, conexion);
+
+                conexion.Open();
+                cmd.ExecuteNonQuery();
+                conexion.Close();
+
+                Publicar(Codes.UsuarioActualizado.ToString()+"///"+guid, "Log");
+            }
+        }
+        catch (MySqlException ex)
+        {
+            cmd.Cancel();
+            conexion.Close();
+            Publicar(GuidCargado+Codes.ErrorAlActualizar.ToString()+ex.ToString(), "Excepcion");
+        }
+    }//ActualizarDatos();
 
     /// <summary>
     /// Eliminar datos del usuario
     /// </summary>
     /// <param name="guid"></param>
-    public void EliminarDatos(Guid guid)
+    public void EliminarDatos()
     {
+        string guidJson = LeerGuidJson();
+
+        try
+        {
+            CargarDatosUsuario(guidJson);
+
+            if (GuidCargado.Equals(guidJson) && ComprobarGuid(guidJson))
+            {
+
+                File.Delete(rutaPath);
+                File.Delete(rutaPath+".meta");
+
+                query = "DELETE FROM datosjugador WHERE Guid like '" + GuidCargado + "';";
+
+                conexion = new MySqlConnection(cadenaConexion);
+
+                cmd = new MySqlCommand(query, conexion);
+
+                conexion.Open();
+                cmd.ExecuteNonQuery();
+                conexion.Close();
+
+                Publicar(Codes.UsuarioEliminado.ToString()+"///"+GuidCargado, "Log");
+
+                SceneManager.LoadScene("MenuPrincipal");
+            }
+        }
+        catch (MySqlException ex)
+        {
+            cmd.Cancel();
+            conexion.Close();
+            Publicar(GuidCargado+Codes.ErrorAlEliminar.ToString()+ex.ToString(), "Excepcion");
+        }
+    }//EliminarDatos();
+
+    #endregion
+
+
+    #region LOG/EXCEPCIONES
+
+    public enum Codes
+    {
+        SinDeterminar,
+        Log_Excepcion,
+        UsuarioCreado,
+        UsuarioActualizado,
+        UsuarioEliminado,
+        UsuarioCargado,
+        ErrorAlGuardar,
+        ErrorAlInsertar,
+        ErrorAlActualizar,
+        ErrorAlCargar,
+        ErrorAlEliminar,
+        ErrorEnElGuid
+    }
+
+    /// <summary>
+    /// Guardar log/excepciones en Base de Datos
+    /// </summary>
+    /// <param name="texto"></param>
+    /// <param name="tipo"></param>
+    public void Publicar(string texto, string tipo)
+    {
+        DateTime fecha = DateTime.Now;
+        fecha.ToString("yyyy-MM-dd H:mm:ss");
+        try
+        {
+            string query = "INSERT INTO " + tipo + "(ID,Texto, Fecha) VALUES(0,'" + texto + "','" + fecha + "');";
+
+            cmd = new MySqlCommand(query, conexion);
+            conexion.Open();
+            cmd.ExecuteNonQuery();
+            conexion.Close();
+            Debug.Log(Codes.Log_Excepcion.ToString() + "///" +tipo);
+        }
+        catch (MySqlException ex)
+        {
+            cmd.Cancel();
+            conexion.Close();
+            Debug.Log("Error al insertar el log/excepcion: " + ex);
+        }
 
     }
 
     #endregion
+
 
     #region GUID
 
@@ -98,14 +255,15 @@ public class SqlServer : MonoBehaviour
     /// Generamos un Guid de tipo String
     /// </summary>
     /// <returns>Devuelve un String de tamaño 13</returns>
-    public String GenerarGuid()
+    public string GenerarGuid()
     {
+
         string nuevoGuid = Guid.NewGuid().ToString().Substring(0,13);
         try
         {
             if (!ComprobarGuid(nuevoGuid))
             {
-                Debug.Log("Guid creado correctamente");
+                Publicar("Guid generado correctamente", "Log");
                 return nuevoGuid;
             }
             else
@@ -115,29 +273,25 @@ public class SqlServer : MonoBehaviour
         }
         catch (MySqlException ex)
         {
-            Debug.Log("Error al crear el Guid: " + ex);
+            Publicar(ex.ToString(), "Excepciones");
         }
 
         return Guid.Empty.ToString(); ;
     }
    
-
-    public bool ComprobarGuid(String guid)
+    /// <summary>
+    /// Comprobar si existe el guid en la base de datos
+    /// </summary>
+    /// <param name="guid"></param>
+    /// <returns></returns>
+    public bool ComprobarGuid(string guid)
     {
-        query = "SELECT Guid FROM datosjugador WHERE Guid like '" + guid + "'";
 
         try
         {
-            conexion = new MySqlConnection(cadenaConexion);
-            cmd = new MySqlCommand(query, conexion);
+            CargarDatosUsuario(guid);
 
-            conexion.Open();
-            adaptador = new MySqlDataAdapter(query, conexion);
-            dt = new DataTable();
-
-            adaptador.Fill(dt);
-
-            if (dt.Rows.Count > 0)
+            if (!String.IsNullOrEmpty(GuidCargado))
             {
                 return true;
             }
@@ -147,66 +301,26 @@ public class SqlServer : MonoBehaviour
         }
         catch (MySqlException ex)
         {
-            Debug.Log("Error al comprobar Guid: " + ex);
             cmd.Cancel();
             conexion.Close();
+            Publicar(ex.ToString(), "Excepciones");
         }
 
         return false;
     }
 
+    /// <summary>
+    /// Devolvemos el guid del Json
+    /// </summary>
+    /// <returns></returns>
+    public string LeerGuidJson()
+    {
+        jsonText = File.ReadAllText(rutaPath);
+        itemData = JsonMapper.ToObject(jsonText);
+        string guid = itemData["guid"].ToString();
+
+        return guid;
+    }
 
     #endregion
 }
-
-
-#region COMENTARIOS
-/*
- string connectionString = "datasource=127.0.0.1;port=3306;username=root;password=;database=test;";
-// Tu consulta en SQL
-string query = "SELECT * FROM user";
-
-// Prepara la conexión
-MySqlConnection databaseConnection = new MySqlConnection(connectionString);
-MySqlCommand commandDatabase = new MySqlCommand(query, databaseConnection);
-commandDatabase.CommandTimeout = 60;
-MySqlDataReader reader;
-
-// A consultar !
-try
-{
-    // Abre la base de datos
-    databaseConnection.Open();
-
-    // Ejecuta la consultas
-    reader = commandDatabase.ExecuteReader();
-
-    // Hasta el momento todo bien, es decir datos obtenidos
-
-    // IMPORTANTE :#
-    // Si tu consulta retorna un resultado, usa el siguiente proceso para obtener datos
-    
-    if (reader.HasRows)
-    {
-        while (reader.Read())
-        {
-            // En nuestra base de datos, el array contiene:  ID 0, FIRST_NAME 1,LAST_NAME 2, ADDRESS 3
-            // Hacer algo con cada fila obtenida
-            string[] row = { reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetString(3) };
-        }
-    }
-    else
-    {
-        Console.WriteLine("No se encontraron datos.");
-    }
-
-    // Cerrar la conexión
-    databaseConnection.Close();
-}
-catch (Exception ex)
-{
-    // Mostrar cualquier excepción
-    MessageBox.Show(ex.Message);
-}
-     */
-#endregion
