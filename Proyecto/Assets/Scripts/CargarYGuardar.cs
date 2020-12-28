@@ -20,7 +20,6 @@ public class CargarYGuardar : MonoBehaviour
     //private int monedas;
     //private double tiempo;
     private string rutaPath;
-    private string respuesta;
 
     #endregion
 
@@ -94,7 +93,6 @@ public class CargarYGuardar : MonoBehaviour
         {
             eliminar.enabled = false;
             monedas.GetComponent<Text>().enabled = false;
-            //goMonedas.SetActive(false);
         }
     }//Cargar()
 
@@ -128,26 +126,8 @@ public class CargarYGuardar : MonoBehaviour
 
 
 
-    #region CLASESUSUARIO
-    /// <summary>
-    /// datos del usuario
-    /// </summary>
-    [Serializable]
-    public class DatosUsuario
-    {
-        public string guid;
-        public string nombre;
-        public int monedas;
-        public double tiempo;
-
-       public DatosUsuario(string guid, string nombre, int monedas, double tiempo)
-        {
-            this.guid = guid;
-            this.nombre = nombre;
-            this.monedas = monedas;
-            this.tiempo = tiempo;
-        }
-    }
+    #region GUID
+   
     /// <summary>
     /// guid personal del usuario
     /// </summary>
