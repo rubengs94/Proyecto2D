@@ -32,7 +32,9 @@ public class CargarYGuardar : MonoBehaviour
     {
         rutaPath = Application.dataPath + "/Guid.json";
     }
-    
+
+    #region MANEJO DE DATOS
+
     /// <summary>
     /// Metodo para guardar datos de la partida del usuario
     /// </summary>
@@ -93,6 +95,7 @@ public class CargarYGuardar : MonoBehaviour
         {
             eliminar.enabled = false;
             monedas.GetComponent<Text>().enabled = false;
+            //goMonedas.SetActive(false);
         }
     }//Cargar()
 
@@ -123,11 +126,11 @@ public class CargarYGuardar : MonoBehaviour
         }
     }//EliminarDatos()
 
+    #endregion
 
 
+    #region CLASESUSUARIO
 
-    #region GUID
-   
     /// <summary>
     /// guid personal del usuario
     /// </summary>
