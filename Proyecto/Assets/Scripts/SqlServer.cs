@@ -11,7 +11,8 @@ public class SqlServer : MonoBehaviour
 
     #region PROPIEDADES
 
-    static readonly string cadenaConexion = "Server=localhost;Database=servidorjuego;Uid=root;Pwd=";
+    //static readonly string cadenaConexion = "Server=localhost;Database=servidorjuego;Uid=root;Pwd=";
+    static readonly string cadenaConexion = "Server=sql144.main-hosting.eu;Port=3306;Database=u716344861_servidorjuego;Uid=u716344861_servidorunity;Pwd=Rubencillo94";
     static MySqlConnection conexion = new MySqlConnection(cadenaConexion);
     static readonly string rutaPath = Application.dataPath + "/Guid.json";
     MySqlCommand cmd;
@@ -44,7 +45,7 @@ public class SqlServer : MonoBehaviour
             conexion.Open();
             cmd.ExecuteNonQuery();
             conexion.Close();
-
+            
             adaptador = new MySqlDataAdapter(query, conexion);
             dt = new DataTable();
             adaptador.Fill(dt);
@@ -56,7 +57,7 @@ public class SqlServer : MonoBehaviour
                 MonedasCargadas = int.Parse(dt.Rows[0]["Monedas"].ToString());
                 MinutosCargados = float.Parse(dt.Rows[0]["Minutos"].ToString());
                 SegundosCargados = float.Parse(dt.Rows[0]["Segundos"].ToString());
-                Publicar(Codes.UsuarioCargado.ToString() + "///"+GuidCargado, "Log");
+                Publicar(Codes.UsuarioCargado.ToString() + "///"+GuidCargado, "log");
             }
 
             conexion.Close();
@@ -66,7 +67,7 @@ public class SqlServer : MonoBehaviour
         {
             cmd.Cancel();
             conexion.Close();
-            Publicar(GuidCargado+Codes.ErrorAlCargar.ToString()+ex.ToString(), "Excepcion");
+            Publicar(GuidCargado+Codes.ErrorAlCargar.ToString()+ex.ToString(), "excepcion");
         }
     }//CargarDatosUsuario();
 
@@ -82,7 +83,7 @@ public class SqlServer : MonoBehaviour
 
         try
         {
-            query = "INSERT INTO datosjugador(Guid, Nombre, Monedas, Tiempo)VALUES('"+guid+"','"+nombre+"',"+monedas+","+Minutos+","+Segundos+");";
+            query = "INSERT INTO datosjugador(Guid, Nombre, Monedas, Minutos, Segundos)VALUES('"+guid+"','"+nombre+"',"+monedas+","+Minutos+","+Segundos+");";
 
             cmd = new MySqlCommand(query, conexion);
 
@@ -90,14 +91,14 @@ public class SqlServer : MonoBehaviour
             cmd.ExecuteNonQuery();
             conexion.Close();
 
-            Publicar(Codes.UsuarioCreado.ToString() + "///" +guid+"///"+nombre, "Log");
+            Publicar(Codes.UsuarioCreado.ToString() + "///" +guid+"///"+nombre, "log");
             
         }
         catch (MySqlException ex)
         {
             cmd.Cancel();
             conexion.Close();
-            Publicar(guid+Codes.ErrorAlInsertar.ToString()+ex.ToString(), "Excepcion");
+            Publicar(guid+Codes.ErrorAlInsertar.ToString()+ex.ToString(), "excepcion");
         }
     }//InsertarDatos();
 
@@ -135,7 +136,7 @@ public class SqlServer : MonoBehaviour
                     cmd.ExecuteNonQuery();
                     conexion.Close();
 
-                    Publicar(Codes.UsuarioActualizado.ToString() + "///" + guid, "Log");
+                    Publicar(Codes.UsuarioActualizado.ToString() + "///" + guid, "log");
                 }
             }
             else
@@ -150,14 +151,14 @@ public class SqlServer : MonoBehaviour
                 cmd.ExecuteNonQuery();
                 conexion.Close();
 
-                Publicar(Codes.UsuarioActualizado.ToString()+"///"+guid, "Log");
+                Publicar(Codes.UsuarioActualizado.ToString()+"///"+guid, "log");
             }
         }
         catch (MySqlException ex)
         {
             cmd.Cancel();
             conexion.Close();
-            Publicar(GuidCargado+Codes.ErrorAlActualizar.ToString()+ex.ToString(), "Excepcion");
+            Publicar(GuidCargado+Codes.ErrorAlActualizar.ToString()+ex.ToString(), "excepcion");
         }
     }//ActualizarDatos();
 
@@ -189,7 +190,7 @@ public class SqlServer : MonoBehaviour
                 cmd.ExecuteNonQuery();
                 conexion.Close();
 
-                Publicar(Codes.UsuarioEliminado.ToString()+"///"+GuidCargado, "Log");
+                Publicar(Codes.UsuarioEliminado.ToString()+"///"+GuidCargado, "log");
 
                 SceneManager.LoadScene("MenuPrincipal");
             }
@@ -198,7 +199,7 @@ public class SqlServer : MonoBehaviour
         {
             cmd.Cancel();
             conexion.Close();
-            Publicar(GuidCargado+Codes.ErrorAlEliminar.ToString()+ex.ToString(), "Excepcion");
+            Publicar(GuidCargado+Codes.ErrorAlEliminar.ToString()+ex.ToString(), "excepcion");
         }
     }//EliminarDatos();
 
@@ -268,7 +269,7 @@ public class SqlServer : MonoBehaviour
         {
             if (!ComprobarGuid(nuevoGuid))
             {
-                Publicar("Guid generado correctamente", "Log");
+                Publicar("Guid generado correctamente", "log");
                 return nuevoGuid;
             }
             else
@@ -278,7 +279,7 @@ public class SqlServer : MonoBehaviour
         }
         catch (MySqlException ex)
         {
-            Publicar(ex.ToString(), "Excepciones");
+            Publicar(ex.ToString(), "excepcion");
         }
 
         return Guid.Empty.ToString(); ;
@@ -308,7 +309,7 @@ public class SqlServer : MonoBehaviour
         {
             cmd.Cancel();
             conexion.Close();
-            Publicar(ex.ToString(), "Excepciones");
+            Publicar(ex.ToString(), "excepcion");
         }
 
         return false;
