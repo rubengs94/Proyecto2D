@@ -19,6 +19,7 @@ public class ControlJuego : MonoBehaviour, IPointerClickHandler
 
     #endregion
 
+
     #region CambiarNivel
 
     /*
@@ -39,7 +40,13 @@ public class ControlJuego : MonoBehaviour, IPointerClickHandler
         PantallaDeCarga.Instancia.CargarEscena(cargarEscena.ToString());
     }
 
+    public void Exit()
+    {
+        Application.Quit();
+    }
+
     #endregion
+
 
     #region Musica
 

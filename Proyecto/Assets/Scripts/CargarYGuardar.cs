@@ -17,6 +17,7 @@ public class CargarYGuardar : MonoBehaviour
     public InputField nombre;
     public Text monedas;
     public Button eliminar;
+    public Image imagen;
     //private int monedas;
     //private double tiempo;
     private string rutaPath;
@@ -55,8 +56,6 @@ public class CargarYGuardar : MonoBehaviour
                 //Cambiar ruta datapath por persistentdatapath
                 File.WriteAllText(rutaPath, itemData.ToString());
 
-
-                Debug.Log("Json creado correctamente");
             }
             
         }
@@ -93,9 +92,11 @@ public class CargarYGuardar : MonoBehaviour
         }
         else
         {
+            imagen.enabled = false;
+            nombre.interactable = true;
             eliminar.enabled = false;
+            eliminar.interactable = false;
             monedas.GetComponent<Text>().enabled = false;
-            //goMonedas.SetActive(false);
         }
     }//Cargar()
 
