@@ -29,7 +29,7 @@ public class ControlJuego : MonoBehaviour, IPointerClickHandler
             switch (nivel)
             {
                 case -1: Application.Quit(); break;
-                case 0: SceneManager.LoadScene("MenuPrincipal"); break;
+                case 0: SceneManager.LoadScene("MenuPrincipal",5f); break;
                 case 1: SceneManager.LoadScene("Nivel1"); break;
             }
     }//cambiarnivel

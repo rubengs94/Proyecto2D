@@ -6,7 +6,7 @@ public class PruebaMovimiento : MonoBehaviour
 {
 	public float maxSpeed=4f; 
 	public float speed=2f;
-	public bool grounded=true;
+	public bool grounded;
 	public float jumpPower=6.5f;
 	
 	private Rigidbody2D rb2d;
@@ -25,9 +25,9 @@ public class PruebaMovimiento : MonoBehaviour
     {
         anim.SetFloat("Speed", Mathf.Abs(rb2d.velocity.x));
 		anim.SetBool("Grounded", grounded);
-		if(Input.GetKeyDown(KeyCode.UpArrow) && grounded==true){
-			jump= true;
-			
+		if(Input.GetKeyDown(KeyCode.UpArrow) && grounded)
+        {
+		    jump= true;
 		}
     }
 	
@@ -49,7 +49,7 @@ public class PruebaMovimiento : MonoBehaviour
 		}
 		
 		//salto
-		if(jump==true){
+		if(jump){
 			rb2d.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
 			jump=false;
 		}
