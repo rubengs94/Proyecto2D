@@ -18,7 +18,6 @@ public class SqlServer : MonoBehaviour
     MySqlCommand cmd;
     MySqlDataAdapter adaptador;
     DataTable dt;
-    PantallaDeCarga pantallaCarga;
     string query;
     string jsonText;
     private JsonData itemData;
@@ -188,7 +187,6 @@ public class SqlServer : MonoBehaviour
 
                 Publicar(Codes.UsuarioEliminado.ToString() + "///" + GuidCargado, "log");
 
-                //SceneManager.LoadScene("MenuPrincipal");
             }
         }
         catch (MySqlException ex)
