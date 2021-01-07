@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using LitJson;
 using System.IO;
+using UnityEngine.SceneManagement;
 
 public class ControlJuego : MonoBehaviour, IPointerClickHandler
 {
@@ -15,7 +16,7 @@ public class ControlJuego : MonoBehaviour, IPointerClickHandler
     public Sprite imagenAudioOff;
     public Button BotonAudio;
     public Escenas cargarEscena;
-    public enum Escenas{ MenuPrincipal, Nivel1 }
+    public enum Escenas{ MenuPrincipal, Nivel1, Report }
 
     #endregion
 
@@ -28,15 +29,40 @@ public class ControlJuego : MonoBehaviour, IPointerClickHandler
             switch (nivel)
             {
                 case -1: Application.Quit(); break;
-                case 0: SceneManager.LoadScene("MenuPrincipal"); break;
+                case 0: SceneManager.LoadScene("MenuPrincipal",5f); break;
                 case 1: SceneManager.LoadScene("Nivel1"); break;
             }
     }//cambiarnivel
     */
 
+
     public void OnPointerClick(PointerEventData eventData)
     {
         PantallaDeCarga.Instancia.CargarEscena(cargarEscena.ToString());
+    }
+
+    /// <summary>
+    /// Cargar escena de reporte
+    /// </summary>
+    public void Reportar()
+    {
+        SceneManager.LoadScene("Reportar");
+    }
+
+    /// <summary>
+    /// Cargar escena principal
+    /// </summary>
+    public void MenuPrincipal()
+    {
+        SceneManager.LoadScene("MenuPrincipal");
+    }
+
+    /// <summary>
+    /// Salir del juego
+    /// </summary>
+    public void Exit()
+    {
+        Application.Quit();
     }
 
     #endregion

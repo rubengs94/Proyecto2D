@@ -20,7 +20,6 @@ public class CargarYGuardar : MonoBehaviour
     //private int monedas;
     //private double tiempo;
     private string rutaPath;
-    private string respuesta;
 
     #endregion
 
@@ -33,7 +32,9 @@ public class CargarYGuardar : MonoBehaviour
     {
         rutaPath = Application.dataPath + "/Guid.json";
     }
-    
+
+    #region MANEJO DE DATOS
+
     /// <summary>
     /// Metodo para guardar datos de la partida del usuario
     /// </summary>
@@ -47,7 +48,7 @@ public class CargarYGuardar : MonoBehaviour
             {
 
                 guid = sql.GenerarGuid();
-                sql.InsertarDatos(guid, nombre.text, 0, 0.0);
+                sql.InsertarDatos(guid, nombre.text, 0, 0,0);
 
                 GuardarGuid guidJson = new GuardarGuid(guid);
                 itemData = JsonMapper.ToJson(guidJson);
@@ -61,7 +62,7 @@ public class CargarYGuardar : MonoBehaviour
         }
         catch(Exception ex)
         {
-            sql.Publicar(SqlServer.Codes.ErrorAlGuardar.ToString()+ex.ToString(), "Excepciones");
+            sql.Publicar(SqlServer.Codes.ErrorAlGuardar.ToString()+ex.ToString(), "Excepcion");
         }
     }//Guardar()
 
@@ -125,29 +126,11 @@ public class CargarYGuardar : MonoBehaviour
         }
     }//EliminarDatos()
 
-
+    #endregion
 
 
     #region CLASESUSUARIO
-    /// <summary>
-    /// datos del usuario
-    /// </summary>
-    [Serializable]
-    public class DatosUsuario
-    {
-        public string guid;
-        public string nombre;
-        public int monedas;
-        public double tiempo;
 
-       public DatosUsuario(string guid, string nombre, int monedas, double tiempo)
-        {
-            this.guid = guid;
-            this.nombre = nombre;
-            this.monedas = monedas;
-            this.tiempo = tiempo;
-        }
-    }
     /// <summary>
     /// guid personal del usuario
     /// </summary>

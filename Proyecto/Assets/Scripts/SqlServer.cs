@@ -11,25 +11,26 @@ public class SqlServer : MonoBehaviour
 
     #region PROPIEDADES
 
-    static readonly string cadenaConexion = "Server=localhost;Database=servidorjuego;Uid=root;Pwd=";
+    //static readonly string cadenaConexion = "Server=localhost;Database=servidorjuego;Uid=root;Pwd=";
+    static readonly string cadenaConexion = "Server=sql144.main-hosting.eu;Port=3306;Database=u716344861_servidorjuego;Uid=u716344861_servidorunity;Pwd=Rubencillo94";
     static MySqlConnection conexion = new MySqlConnection(cadenaConexion);
     static readonly string rutaPath = Application.dataPath + "/Guid.json";
     MySqlCommand cmd;
     MySqlDataAdapter adaptador;
     DataTable dt;
+    PantallaDeCarga pantallaCarga;
     string query;
     string jsonText;
-    CargarYGuardar cargaryguardar;
     private JsonData itemData;
     public string GuidCargado { get; set; }
     public string NombreCargado { get; set; }
     public int MonedasCargadas { get; set; }
-    public double TiempoCargado { get; set; }
+    public float MinutosCargados { get; set; }
+    public float SegundosCargados { get; set; }
 
     #endregion
 
 
-    
     #region MANEJO DE DATOS
 
     /// <summary>
@@ -44,7 +45,7 @@ public class SqlServer : MonoBehaviour
             conexion.Open();
             cmd.ExecuteNonQuery();
             conexion.Close();
-
+            
             adaptador = new MySqlDataAdapter(query, conexion);
             dt = new DataTable();
             adaptador.Fill(dt);
@@ -54,8 +55,9 @@ public class SqlServer : MonoBehaviour
                 GuidCargado = dt.Rows[0]["Guid"].ToString();
                 NombreCargado = dt.Rows[0]["Nombre"].ToString();
                 MonedasCargadas = int.Parse(dt.Rows[0]["Monedas"].ToString());
-                TiempoCargado = Double.Parse(dt.Rows[0]["Tiempo"].ToString());
-                Publicar(Codes.UsuarioCargado.ToString() + "///"+GuidCargado, "Log");
+                MinutosCargados = float.Parse(dt.Rows[0]["Minutos"].ToString());
+                SegundosCargados = float.Parse(dt.Rows[0]["Segundos"].ToString());
+
             }
 
             conexion.Close();
@@ -65,7 +67,7 @@ public class SqlServer : MonoBehaviour
         {
             cmd.Cancel();
             conexion.Close();
-            Publicar(GuidCargado+Codes.ErrorAlCargar.ToString()+ex.ToString(), "Excepcion");
+            Publicar(GuidCargado+Codes.ErrorAlCargar.ToString()+ex.ToString(), "excepcion");
         }
     }//CargarDatosUsuario();
 
@@ -76,27 +78,32 @@ public class SqlServer : MonoBehaviour
     /// <param name="nombre">Nombre del usuario</param>
     /// <param name="monedas">Monedas en la cuenta</param>
     /// <param name="tiempo">Tiempo record del juego</param>
-    public void InsertarDatos(string guid, string nombre, int monedas, double tiempo)
+    public void InsertarDatos(string guid, string nombre, int monedas, float Minutos, float Segundos)
     {
 
         try
         {
-            query = "INSERT INTO datosjugador(Guid, Nombre, Monedas, Tiempo)VALUES('"+guid+"','"+nombre+"',"+monedas+","+tiempo+");";
 
-            cmd = new MySqlCommand(query, conexion);
+            cmd = new MySqlCommand("Player_Insert", conexion);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@Guid", guid);
+            cmd.Parameters.AddWithValue("@Nombre", nombre);
+            cmd.Parameters.AddWithValue("@Monedas", monedas);
+            cmd.Parameters.AddWithValue("@Minutos", Minutos);
+            cmd.Parameters.AddWithValue("@Segundos", Segundos);
 
             conexion.Open();
             cmd.ExecuteNonQuery();
             conexion.Close();
 
-            Publicar(Codes.UsuarioCreado.ToString() + "///" +guid+"///"+nombre, "Log");
-            
+            Publicar(Codes.UsuarioCreado.ToString() + "///" + guid + "///" + nombre, "log");
+
         }
         catch (MySqlException ex)
         {
             cmd.Cancel();
             conexion.Close();
-            Publicar(guid+Codes.ErrorAlInsertar.ToString()+ex.ToString(), "Excepcion");
+            Publicar(guid+Codes.ErrorAlInsertar.ToString()+ex.ToString(), "excepcion");
         }
     }//InsertarDatos();
 
@@ -105,7 +112,7 @@ public class SqlServer : MonoBehaviour
     /// </summary>
     /// <param name="monedas"></param>
     /// <param name="tiempo"></param>
-    public void ActualizarDatos(int monedas, string tiempo)
+    public void ActualizarDatos(int monedas, float minutos, float segundos)
     {
 
         string guid = LeerGuidJson();
@@ -115,44 +122,42 @@ public class SqlServer : MonoBehaviour
             //obtenemos el tiempo para comprobar si lo ha superado
             CargarDatosUsuario(guid);
 
+            cmd = new MySqlCommand("UpdatePlayer_Coins", conexion);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@guidUpdate", GuidCargado);
+            cmd.Parameters.AddWithValue("@coins", monedas);
+
             //Si el tiempo nuevo es mayor que en la base de datos
             //guardamos el tiempo y actualizamos
             //Si es menor, actualizamos solo las monedas
-            if (Double.Parse(tiempo) > TiempoCargado)
+            if (minutos >= MinutosCargados)
             {
-                query = "UPDATE datosjugador" +
-                    " SET Monedas = " + monedas +
-                    ",Tiempo = " + tiempo + 
-                    " WHERE Guid like '"+ guid +"';";
+                if (segundos > SegundosCargados)
+                {
+                    cmd.Parameters.AddWithValue("@minutes", minutos);
+                    cmd.Parameters.AddWithValue("@seconds", segundos);
 
-                cmd = new MySqlCommand(query, conexion);
-
-                conexion.Open();
-                cmd.ExecuteNonQuery();
-                conexion.Close();
-
-                Publicar(Codes.UsuarioActualizado.ToString() + "///" +guid, "Log");
+                }
             }
             else
             {
-                query = "UPDATE datosjugador" +
-                    " SET Monedas = " + monedas +
-                    " WHERE Guid like '" + guid + "';";
 
-                cmd = new MySqlCommand(query, conexion);
+                cmd.Parameters.AddWithValue("@minutes", MinutosCargados);
+                cmd.Parameters.AddWithValue("@seconds", SegundosCargados);
 
-                conexion.Open();
-                cmd.ExecuteNonQuery();
-                conexion.Close();
-
-                Publicar(Codes.UsuarioActualizado.ToString()+"///"+guid, "Log");
             }
+
+            conexion.Open();
+            cmd.ExecuteNonQuery();
+            conexion.Close();
+            Publicar(Codes.UsuarioActualizado.ToString() + "///" + guid, "log");
+
         }
         catch (MySqlException ex)
         {
             cmd.Cancel();
             conexion.Close();
-            Publicar(GuidCargado+Codes.ErrorAlActualizar.ToString()+ex.ToString(), "Excepcion");
+            Publicar(GuidCargado+Codes.ErrorAlActualizar.ToString()+ex.ToString(), "excepcion");
         }
     }//ActualizarDatos();
 
@@ -166,34 +171,31 @@ public class SqlServer : MonoBehaviour
 
         try
         {
-            CargarDatosUsuario(guidJson);
-
-            if (GuidCargado.Equals(guidJson) && ComprobarGuid(guidJson))
+            if (ComprobarGuid(guidJson))
             {
 
-                File.Delete(rutaPath);
-                File.Delete(rutaPath+".meta");
-
-                query = "DELETE FROM datosjugador WHERE Guid like '" + GuidCargado + "';";
-
                 conexion = new MySqlConnection(cadenaConexion);
-
-                cmd = new MySqlCommand(query, conexion);
+                cmd = new MySqlCommand("Player_Delete", conexion);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@guidBorrado", GuidCargado);
 
                 conexion.Open();
                 cmd.ExecuteNonQuery();
                 conexion.Close();
 
-                Publicar(Codes.UsuarioEliminado.ToString()+"///"+GuidCargado, "Log");
+                File.Delete(rutaPath);
+                File.Delete(rutaPath + ".meta");//Borrar al tener el .exe
 
-                SceneManager.LoadScene("MenuPrincipal");
+                Publicar(Codes.UsuarioEliminado.ToString() + "///" + GuidCargado, "log");
+
+                //SceneManager.LoadScene("MenuPrincipal");
             }
         }
         catch (MySqlException ex)
         {
             cmd.Cancel();
             conexion.Close();
-            Publicar(GuidCargado+Codes.ErrorAlEliminar.ToString()+ex.ToString(), "Excepcion");
+            Publicar(GuidCargado+Codes.ErrorAlEliminar.ToString()+ex.ToString(), "excepcion");
         }
     }//EliminarDatos();
 
@@ -202,9 +204,13 @@ public class SqlServer : MonoBehaviour
 
     #region LOG/EXCEPCIONES
 
+    /// <summary>
+    /// Coleccion de log/errores
+    /// </summary>
     public enum Codes
     {
         SinDeterminar,
+        ReportInsertado,
         Log_Excepcion,
         UsuarioCreado,
         UsuarioActualizado,
@@ -215,7 +221,8 @@ public class SqlServer : MonoBehaviour
         ErrorAlActualizar,
         ErrorAlCargar,
         ErrorAlEliminar,
-        ErrorEnElGuid
+        ErrorEnElGuid,
+        ErrorReport
     }
 
     /// <summary>
@@ -227,15 +234,32 @@ public class SqlServer : MonoBehaviour
     {
         DateTime fecha = DateTime.Now;
         fecha.ToString("yyyy-MM-dd H:mm:ss");
+
         try
         {
-            string query = "INSERT INTO " + tipo + "(ID,Texto, Fecha) VALUES(0,'" + texto + "','" + fecha + "');";
+            if (tipo.Equals("log"))
+            {
 
-            cmd = new MySqlCommand(query, conexion);
+                cmd = new MySqlCommand("Insert_Log", conexion);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@text", texto);
+                cmd.Parameters.AddWithValue("@date", fecha);
+
+            }
+            else
+            {
+
+                cmd = new MySqlCommand("Insert_Excepcion", conexion);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@text", texto);
+                cmd.Parameters.AddWithValue("@date", fecha);
+
+            }
+
             conexion.Open();
             cmd.ExecuteNonQuery();
             conexion.Close();
-            Debug.Log(Codes.Log_Excepcion.ToString() + "///" +tipo);
+            Debug.Log(Codes.Log_Excepcion.ToString() + "///" + tipo);
         }
         catch (MySqlException ex)
         {
@@ -245,6 +269,48 @@ public class SqlServer : MonoBehaviour
         }
 
     }
+
+    #endregion
+
+
+    #region SYSTEM REPORT
+
+    public void Report(string tituloReport, string textoReport)
+    {
+
+        string guid = LeerGuidJson();
+        DateTime fecha = DateTime.Now;
+        fecha.ToString("yyyy-MM-dd H:mm:ss");
+
+        try
+        {
+
+            CargarDatosUsuario(guid);
+
+            conexion = new MySqlConnection(cadenaConexion);
+            cmd = new MySqlCommand("Insert_Report", conexion);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@guidReport", GuidCargado);
+            cmd.Parameters.AddWithValue("@tituloReport", tituloReport);
+            cmd.Parameters.AddWithValue("@textoReport", textoReport);
+            cmd.Parameters.AddWithValue("@Fecha", fecha);
+
+            conexion.Open();
+            cmd.ExecuteNonQuery();
+            conexion.Close();
+
+            Publicar(Codes.ReportInsertado.ToString() + "///" + GuidCargado, "log");
+
+
+
+        }
+        catch(MySqlException ex)
+        {
+            Publicar(Codes.ErrorReport+ex.ToString(), "excepcion");
+        }
+
+    }
+
 
     #endregion
 
@@ -263,7 +329,6 @@ public class SqlServer : MonoBehaviour
         {
             if (!ComprobarGuid(nuevoGuid))
             {
-                Publicar("Guid generado correctamente", "Log");
                 return nuevoGuid;
             }
             else
@@ -273,7 +338,7 @@ public class SqlServer : MonoBehaviour
         }
         catch (MySqlException ex)
         {
-            Publicar(ex.ToString(), "Excepciones");
+            Publicar(ex.ToString(), "excepcion");
         }
 
         return Guid.Empty.ToString(); ;
@@ -303,7 +368,7 @@ public class SqlServer : MonoBehaviour
         {
             cmd.Cancel();
             conexion.Close();
-            Publicar(ex.ToString(), "Excepciones");
+            Publicar(ex.ToString(), "excepcion");
         }
 
         return false;

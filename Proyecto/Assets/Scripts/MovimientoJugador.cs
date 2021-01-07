@@ -20,7 +20,7 @@ public class MovimientoJugador : MonoBehaviour
             if(GetComponent<SpriteRenderer>().flipX==true){
                 GetComponent<SpriteRenderer>().flipX=false;
             }
-            transform.Translate(0.02f,0,0);
+            transform.Translate(0.05f,0,0);
         }
         else if(Input.GetKey(KeyCode.A) || Input.GetKey("left")){
             if(GetComponent<SpriteRenderer>().flipX==false){
