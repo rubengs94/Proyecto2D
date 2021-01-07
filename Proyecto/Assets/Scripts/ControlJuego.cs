@@ -5,7 +5,7 @@ using LitJson;
 using System.IO;
 using UnityEngine.SceneManagement;
 
-public class ControlJuego : MonoBehaviour, IPointerClickHandler
+public class ControlJuego : MonoBehaviour
 {
     #region PROPIEDADES
 
@@ -15,56 +15,44 @@ public class ControlJuego : MonoBehaviour, IPointerClickHandler
     public Sprite imagenAudioOn;
     public Sprite imagenAudioOff;
     public Button BotonAudio;
-    public Escenas cargarEscena;
-    public enum Escenas{ MenuPrincipal, Nivel1, Report }
+    public Image imagen;
+    private string juego;
 
     #endregion
 
+    void Start()
+    {
+        imagen.enabled = false;
+        imagen.color = new Color32(0,0,0,0);
+    }
+
     #region CambiarNivel
 
-    /*
-     * ANTIGUO CAMBIO DE NIVEL
-    public void CambiarNivel (int nivel)
+    /// <summary>
+    /// pantalla negra para cargar
+    /// </summary>
+    /// <param name="escena"></param>
+    public void PantallaCarga(string escena)
     {
-            switch (nivel)
-            {
-                case -1: Application.Quit(); break;
-                case 0: SceneManager.LoadScene("MenuPrincipal",5f); break;
-                case 1: SceneManager.LoadScene("Nivel1"); break;
-            }
-    }//cambiarnivel
-    */
+        juego = escena;
+        imagen.enabled = true;
+        imagen.color = new Color32(0,0,0,255);
+        Invoke("CargarEscena", 3f);
 
-
-    public void OnPointerClick(PointerEventData eventData)
+    }
+    
+    /// <summary>
+    /// CArga de la escena
+    /// </summary>
+    private void CargarEscena()
     {
-        PantallaDeCarga.Instancia.CargarEscena(cargarEscena.ToString());
+        SceneManager.LoadScene(juego);   
     }
 
-    /// <summary>
-    /// Cargar escena de reporte
-    /// </summary>
-    public void Reportar()
-    {
-        SceneManager.LoadScene("Reportar");
-    }
-
-    /// <summary>
-    /// Cargar escena principal
-    /// </summary>
-    public void MenuPrincipal()
-    {
-        SceneManager.LoadScene("MenuPrincipal");
-    }
-
-    /// <summary>
-    /// Salir del juego
-    /// </summary>
     public void Exit()
     {
         Application.Quit();
     }
-
     #endregion
 
     #region Musica

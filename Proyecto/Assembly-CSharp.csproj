@@ -68,7 +68,6 @@
     <Compile Include="Assets\Scripts\ControlJuego.cs" />
     <Compile Include="Assets\Scripts\ControlPuntuacion.cs" />
     <Compile Include="Assets\Scripts\MovimientoJugador.cs" />
-    <Compile Include="Assets\Scripts\PantallaDeCarga.cs" />
     <Compile Include="Assets\Scripts\PruebaMovimiento.cs" />
     <Compile Include="Assets\Scripts\Report.cs" />
     <Compile Include="Assets\Scripts\SqlServer.cs" />

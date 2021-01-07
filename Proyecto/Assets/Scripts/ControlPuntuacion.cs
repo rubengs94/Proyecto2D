@@ -19,7 +19,7 @@ public class ControlPuntuacion : MonoBehaviour
     private Text Texto;
     private float TiempoFrameConTiempoScale = 0f;
     private float tiempoMostrarEnSegundos = 0F;
-    private float escalaDeTiempoAlPausar, escalaDeTiempoInicial;
+    private float escalaDeTiempoInicial;
     private bool EstaPausado = false;
 
     #endregion
@@ -37,6 +37,7 @@ public class ControlPuntuacion : MonoBehaviour
 
     public void guardarDatos()
     {
+
         sql = new SqlServer();
         string [] separar = Texto.text.Split(':');
         float minuto = float.Parse(separar[0]);
@@ -56,9 +57,6 @@ public class ControlPuntuacion : MonoBehaviour
     {
         //cargamos las monedas
         CargarMonedas();
-
-        //Escala de Tiempo Original
-        escalaDeTiempoInicial = escalaDeTiempo;
 
         Texto = GetComponent<Text>();
         tiempoMostrarEnSegundos = tiempoinicial;
@@ -102,13 +100,12 @@ public class ControlPuntuacion : MonoBehaviour
         if (!EstaPausado)
         {
             EstaPausado = true;
-            escalaDeTiempoAlPausar = escalaDeTiempo;
             escalaDeTiempo = 0;
         }
         else
         {
             EstaPausado = false;
-            escalaDeTiempo = escalaDeTiempoAlPausar;
+            escalaDeTiempo = 1;
         }
     }
 

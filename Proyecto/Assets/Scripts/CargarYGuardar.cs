@@ -16,6 +16,7 @@ public class CargarYGuardar : MonoBehaviour
     private string guid;
     public InputField nombre;
     public Text monedas;
+    public Button Jugar;
     public Button eliminar;
     //private int monedas;
     //private double tiempo;
@@ -31,6 +32,20 @@ public class CargarYGuardar : MonoBehaviour
     private void Awake()
     {
         rutaPath = Application.dataPath + "/Guid.json";
+    }
+
+    private void Update()
+    {
+        if (String.IsNullOrEmpty(nombre.text))
+        {
+            Jugar.enabled = false;
+            Jugar.interactable = false;
+        }
+        else
+        {
+            Jugar.enabled = true;
+            Jugar.interactable = true;
+        }
     }
 
     #region MANEJO DE DATOS
@@ -85,17 +100,19 @@ public class CargarYGuardar : MonoBehaviour
             if (!String.IsNullOrEmpty(sql.NombreCargado))
             {
                 eliminar.enabled = true;
+                eliminar.interactable = true;
                 nombre.interactable = false;
                 nombre.text = sql.NombreCargado;
                 monedas.text = "Monedas: "+sql.MonedasCargadas.ToString();
                 monedas.GetComponent<Text>().enabled = true;
             }
+
         }
         else
         {
             eliminar.enabled = false;
+            eliminar.interactable = false;
             monedas.GetComponent<Text>().enabled = false;
-            //goMonedas.SetActive(false);
         }
     }//Cargar()
 
@@ -124,7 +141,8 @@ public class CargarYGuardar : MonoBehaviour
         {
             sql.EliminarDatos();
         }
-    }//EliminarDatos()
+
+    }
 
     #endregion
 
