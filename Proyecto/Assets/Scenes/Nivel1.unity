@@ -668,7 +668,7 @@ GameObject:
   - component: {fileID: 208508130}
   - component: {fileID: 208508129}
   m_Layer: 0
-  m_Name: test
+  m_Name: ControlJuego
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
