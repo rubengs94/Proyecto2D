@@ -37,8 +37,8 @@ public class ControlJuego : MonoBehaviour
         juego = escena;
         imagen.enabled = true;
         imagen.color = new Color32(0,0,0,255);
+        Time.timeScale = 1f;
         Invoke("CargarEscena", 3f);
-
     }
     
     /// <summary>
