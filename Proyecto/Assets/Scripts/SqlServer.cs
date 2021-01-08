@@ -21,11 +21,11 @@ public class SqlServer : MonoBehaviour
     string query;
     string jsonText;
     private JsonData itemData;
-    public string GuidCargado { get; set; }
-    public string NombreCargado { get; set; }
-    public int MonedasCargadas { get; set; }
-    public float MinutosCargados { get; set; }
-    public float SegundosCargados { get; set; }
+    public string GuidCargado;
+    public string NombreCargado;
+    public int MonedasCargadas;
+    public string MinutosCargados;
+    public string SegundosCargados;
 
     #endregion
 
@@ -54,8 +54,8 @@ public class SqlServer : MonoBehaviour
                 GuidCargado = dt.Rows[0]["Guid"].ToString();
                 NombreCargado = dt.Rows[0]["Nombre"].ToString();
                 MonedasCargadas = int.Parse(dt.Rows[0]["Monedas"].ToString());
-                MinutosCargados = float.Parse(dt.Rows[0]["Minutos"].ToString());
-                SegundosCargados = float.Parse(dt.Rows[0]["Segundos"].ToString());
+                MinutosCargados = (dt.Rows[0]["Minutos"].ToString());
+                SegundosCargados = (dt.Rows[0]["Segundos"].ToString());
 
             }
 
@@ -77,7 +77,7 @@ public class SqlServer : MonoBehaviour
     /// <param name="nombre">Nombre del usuario</param>
     /// <param name="monedas">Monedas en la cuenta</param>
     /// <param name="tiempo">Tiempo record del juego</param>
-    public void InsertarDatos(string guid, string nombre, int monedas, float Minutos, float Segundos)
+    public void InsertarDatos(string guid, string nombre, int monedas, string Minutos, string Segundos)
     {
 
         try
@@ -111,7 +111,7 @@ public class SqlServer : MonoBehaviour
     /// </summary>
     /// <param name="monedas"></param>
     /// <param name="tiempo"></param>
-    public void ActualizarDatos(int monedas, float minutos, float segundos)
+    public void ActualizarDatos(int monedas, string minutos, string segundos)
     {
 
         string guid = LeerGuidJson();
@@ -120,23 +120,22 @@ public class SqlServer : MonoBehaviour
         {
             //obtenemos el tiempo para comprobar si lo ha superado
             CargarDatosUsuario(guid);
-
+            int monedaTotal = MonedasCargadas + monedas;
             cmd = new MySqlCommand("UpdatePlayer_Coins", conexion);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@guidUpdate", GuidCargado);
-            cmd.Parameters.AddWithValue("@coins", monedas);
+            cmd.Parameters.AddWithValue("@coins", monedaTotal);
 
             //Si el tiempo nuevo es mayor que en la base de datos
             //guardamos el tiempo y actualizamos
             //Si es menor, actualizamos solo las monedas
-            if (minutos >= MinutosCargados)
+            if (float.Parse(minutos) > float.Parse(MinutosCargados) && 
+                float.Parse(segundos) > float.Parse(SegundosCargados))
             {
-                if (segundos > SegundosCargados)
-                {
-                    cmd.Parameters.AddWithValue("@minutes", minutos);
-                    cmd.Parameters.AddWithValue("@seconds", segundos);
 
-                }
+                cmd.Parameters.AddWithValue("@minutes", minutos);
+                cmd.Parameters.AddWithValue("@seconds", segundos);
+
             }
             else
             {

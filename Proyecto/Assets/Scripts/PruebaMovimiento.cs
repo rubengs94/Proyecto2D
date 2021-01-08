@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class PruebaMovimiento : MonoBehaviour
 {
-	public float maxSpeed=4f; 
-	public float speed=2f;
 	public bool grounded;
-	public float jumpPower=6.5f;
+	public float jumpPower;
 	
 	private Rigidbody2D rb2d;
 	private Animator anim;
@@ -23,36 +21,46 @@ public class PruebaMovimiento : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        anim.SetFloat("Speed", Mathf.Abs(rb2d.velocity.x));
+        
 		anim.SetBool("Grounded", grounded);
-		if(Input.GetKeyDown(KeyCode.UpArrow) && grounded)
+		if(Input.GetButtonDown("Jump") && grounded)
         {
 		    jump= true;
 		}
+		
+		
     }
 	
 	void FixedUpdate()
 	{
-		float h=Input.GetAxis("Horizontal");
-		rb2d.AddForce(Vector2.right * speed * h); 
+		if(Input.GetKey(KeyCode.D) || Input.GetKey("right")){
+			anim.SetBool("Speed",true);
+            if(GetComponent<SpriteRenderer>().flipX==true){
+                GetComponent<SpriteRenderer>().flipX=false;
+            }
+            transform.Translate(0.05f,0,0);
+        }
+        else if(Input.GetKey(KeyCode.A) || Input.GetKey("left")){
+			anim.SetBool("Speed",true);
+            if(GetComponent<SpriteRenderer>().flipX==false){
+                GetComponent<SpriteRenderer>().flipX=true;
+            }
+            transform.Translate(-0.05f,0,0);
+        }
+        else{
+			anim.SetBool("Speed",false);
+            transform.Translate(0,0,0);
+        }
 		
-		float limitedSpeed=Mathf.Clamp(rb2d.velocity.x, -maxSpeed, maxSpeed);
 		
-		rb2d.velocity=new Vector2(limitedSpeed, rb2d.velocity.y);
 		
-		//rotar personaje
-		if(h > 0.1f){
-			transform.localScale=new Vector3(1f,1f,1f);
-		}
-		if(h < -0.1f){
-			transform.localScale=new Vector3(-1f,1f,1f);
-		}
 		
 		//salto
 		if(jump){
+			anim.SetBool("Speed",false);
 			rb2d.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
 			jump=false;
 		}
-		Debug.Log(rb2d.velocity.x);
+		//Debug.Log(rb2d.velocity.x);
 	}
 }

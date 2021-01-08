@@ -8,15 +8,13 @@ public class ControlPuntuacion : MonoBehaviour
     #region PROPIEDADES
 
     SqlServer sql;
-    private int monedasCargadas;
-    public static int Monedas { get; set; }
-    public double Tiempo { get; set; }
+    private int Monedas = 20;
     [Tooltip("Tiempo iniciar en Segundos")]
     public int tiempoinicial;
     [Tooltip("Escala del Tiempo del Reloj")]
     [Range(-10.0f, 10.0f)]
     public float escalaDeTiempo = 1;
-    private Text Texto;
+    private TextMesh Texto;
     private float TiempoFrameConTiempoScale = 0f;
     private float tiempoMostrarEnSegundos = 0F;
     private float escalaDeTiempoInicial;
@@ -31,8 +29,7 @@ public class ControlPuntuacion : MonoBehaviour
     /// </summary>
     private void CargarMonedas()
     {
-        sql = new SqlServer();
-        monedasCargadas = sql.MonedasCargadas;
+
     }
 
     public void guardarDatos()
@@ -40,8 +37,8 @@ public class ControlPuntuacion : MonoBehaviour
 
         sql = new SqlServer();
         string [] separar = Texto.text.Split(':');
-        float minuto = float.Parse(separar[0]);
-        float segundo = float.Parse(separar[1]);
+        string minuto = separar[0];
+        string segundo = separar[1];
 
         sql.ActualizarDatos(Monedas, minuto, segundo);
     }
@@ -58,7 +55,7 @@ public class ControlPuntuacion : MonoBehaviour
         //cargamos las monedas
         CargarMonedas();
 
-        Texto = GetComponent<Text>();
+        Texto = GameObject.Find("Reloj").GetComponent<TextMesh>();
         tiempoMostrarEnSegundos = tiempoinicial;
 
         ActualizarReloj(tiempoinicial);
