@@ -16,6 +16,7 @@ public class ControlJuego : MonoBehaviour
     public Sprite imagenAudioOff;
     public Button BotonAudio;
     public Image imagen;
+    ControlPuntuacion control;
     private string juego;
 
     #endregion
@@ -25,6 +26,7 @@ public class ControlJuego : MonoBehaviour
         imagen.enabled = false;
         imagen.color = new Color32(0,0,0,0);
     }
+
 
     #region CambiarNivel
 

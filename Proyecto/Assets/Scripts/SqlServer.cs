@@ -129,8 +129,8 @@ public class SqlServer : MonoBehaviour
             //Si el tiempo nuevo es mayor que en la base de datos
             //guardamos el tiempo y actualizamos
             //Si es menor, actualizamos solo las monedas
-            if (float.Parse(minutos) > float.Parse(MinutosCargados) && 
-                float.Parse(segundos) > float.Parse(SegundosCargados))
+            if (float.Parse(minutos) >= float.Parse(MinutosCargados) && 
+                float.Parse(segundos) >= float.Parse(SegundosCargados))
             {
 
                 cmd.Parameters.AddWithValue("@minutes", minutos);
