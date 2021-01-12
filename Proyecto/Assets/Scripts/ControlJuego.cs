@@ -16,7 +16,6 @@ public class ControlJuego : MonoBehaviour
     public Sprite imagenAudioOff;
     public Button BotonAudio;
     public Image imagen;
-    public GameObject letras;
     ControlPuntuacion control;
     private string juego;
 
@@ -25,8 +24,7 @@ public class ControlJuego : MonoBehaviour
     void Start()
     {
         imagen.enabled = false;
-        letras.SetActive(false);
-        imagen.color = new Color32(41,112,224,0);
+        imagen.color = new Color32(0,0,0,0);
     }
 
 
@@ -40,8 +38,7 @@ public class ControlJuego : MonoBehaviour
     {
         juego = escena;
         imagen.enabled = true;
-        imagen.color = new Color32(41, 112, 224, 255);
-        letras.SetActive(true);
+        imagen.color = new Color32(0,0,0,255);
         Time.timeScale = 1f;
         Invoke("CargarEscena", 3f);
     }
