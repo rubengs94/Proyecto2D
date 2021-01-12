@@ -14,6 +14,14 @@ public class PauseMenu : MonoBehaviour
 
     #endregion
 
+    private void Start()
+    {
+        pauseMenuUI.SetActive(false);
+        ConfirmarUI.SetActive(false);
+        Reanudar();
+    }
+
+
     // Update is called once per frame
     void Update()
     {
@@ -29,6 +37,12 @@ public class PauseMenu : MonoBehaviour
             }
         }
 
+    }
+
+
+    public void Reiniciar()
+    {
+        SceneManager.LoadScene("Nivel1");
     }
 
 
@@ -67,6 +81,12 @@ public class PauseMenu : MonoBehaviour
     {
         pauseMenuUI.SetActive(false);
         ConfirmarUI.SetActive(true);
+    }
+
+
+    public void Si()
+    {
+        ConfirmarUI.SetActive(false);
     }
 
     /// <summary>

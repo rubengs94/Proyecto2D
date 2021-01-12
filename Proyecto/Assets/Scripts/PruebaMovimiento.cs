@@ -3,7 +3,7 @@
 public class PruebaMovimiento : MonoBehaviour
 {
 	public bool grounded;
-    
+    public new AudioSource audio;
     private int monedas = 0;
 	public float jumpPower;
 	private Rigidbody2D rb2d;
@@ -25,6 +25,7 @@ public class PruebaMovimiento : MonoBehaviour
 		anim.SetBool("Grounded", grounded);
 		if(Input.GetButtonDown("Jump") && grounded)
         {
+			audio.Play();//sonido salto
 		    jump= true;
 		}
 		
