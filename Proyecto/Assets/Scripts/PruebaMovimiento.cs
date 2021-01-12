@@ -4,7 +4,6 @@ public class PruebaMovimiento : MonoBehaviour
 {
 	public bool grounded;
     public new AudioSource audio;
-    private int monedas = 0;
 	public float jumpPower;
 	private Rigidbody2D rb2d;
 	private Animator anim;
