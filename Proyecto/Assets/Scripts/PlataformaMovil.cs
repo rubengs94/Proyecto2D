@@ -12,6 +12,7 @@ public class PlataformaMovil : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
         if (target != null)
         {
             target.parent = null;
@@ -25,7 +26,6 @@ public class PlataformaMovil : MonoBehaviour
     {
         
     }
-
 
 
     private void FixedUpdate()

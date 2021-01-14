@@ -10,7 +10,7 @@ PrefabInstance:
     - target: {fileID: 768628011105102052, guid: cd0c528abaad3304fbfccb2a726adc54,
         type: 3}
       propertyPath: m_Name
-      value: Suelo Flotante Fake
+      value: Suelo Flotante Fake Variant
       objectReference: {fileID: 0}
     - target: {fileID: 768628011105102053, guid: cd0c528abaad3304fbfccb2a726adc54,
         type: 3}
@@ -30,12 +30,12 @@ PrefabInstance:
     - target: {fileID: 768628011105102054, guid: cd0c528abaad3304fbfccb2a726adc54,
         type: 3}
       propertyPath: m_Offset.x
-      value: 1.0403588
+      value: 1.1310523
       objectReference: {fileID: 0}
     - target: {fileID: 768628011105102054, guid: cd0c528abaad3304fbfccb2a726adc54,
         type: 3}
       propertyPath: m_Size.x
-      value: 0.9967904
+      value: 0.81540346
       objectReference: {fileID: 0}
     - target: {fileID: 1775624111406896102, guid: cd0c528abaad3304fbfccb2a726adc54,
         type: 3}
