@@ -42,4 +42,11 @@ public class MovimientoJugador : MonoBehaviour
     private void OnTriggerExit2D(Collider2D collision){
         isGrounded=false;
     }
+
+    #region CHOQUE ENEMIGOS/TRAMPAS
+
+
+    #endregion
+
+
 }

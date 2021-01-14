@@ -9,6 +9,7 @@ TagManager:
   - coins
   - Platform
   - Enemy
+  - Lava
   layers:
   - Default
   - TransparentFX

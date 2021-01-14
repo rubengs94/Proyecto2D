@@ -38,16 +38,6 @@ public class MovimientoEnemigo : MonoBehaviour
         if (transform.position == target.position)
         {
             target.position = (target.position == start) ? end : start;
-        }
-
-
-        if (speed > 0)
-        {
-            transform.localScale = new Vector3(6.093128f, 6.093128f, 6.093128f);
-        }
-        else if (speed < 0)
-        {
-            transform.localScale = new Vector3(-6.093128f, 6.093128f, 6.093128f);
-        }
+        }  
     }
 }

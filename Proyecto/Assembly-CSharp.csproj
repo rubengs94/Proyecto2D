@@ -70,7 +70,9 @@
     <Compile Include="Assets\Scripts\DrawSceneLine.cs" />
     <Compile Include="Assets\Scripts\EffectsButton.cs" />
     <Compile Include="Assets\Scripts\Fallin.cs" />
+    <Compile Include="Assets\Scripts\FallinLava.cs" />
     <Compile Include="Assets\Scripts\MejoraSalto.cs" />
+    <Compile Include="Assets\Scripts\MoverFondo.cs" />
     <Compile Include="Assets\Scripts\MovimientoEnemigo.cs" />
     <Compile Include="Assets\Scripts\MovimientoJugador.cs" />
     <Compile Include="Assets\Scripts\PauseMenu.cs" />
