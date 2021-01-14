@@ -68,9 +68,10 @@
     <Compile Include="Assets\Scripts\ControlJuego.cs" />
     <Compile Include="Assets\Scripts\ControlPuntuacion.cs" />
     <Compile Include="Assets\Scripts\DrawSceneLine.cs" />
-    <Compile Include="Assets\Scripts\Effects.cs" />
+    <Compile Include="Assets\Scripts\EffectsButton.cs" />
     <Compile Include="Assets\Scripts\Fallin.cs" />
     <Compile Include="Assets\Scripts\MejoraSalto.cs" />
+    <Compile Include="Assets\Scripts\MovimientoEnemigo.cs" />
     <Compile Include="Assets\Scripts\MovimientoJugador.cs" />
     <Compile Include="Assets\Scripts\PauseMenu.cs" />
     <Compile Include="Assets\Scripts\PlataformaMovil.cs" />
