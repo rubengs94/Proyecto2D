@@ -20,7 +20,7 @@ PrefabInstance:
     - target: {fileID: 5421828019962178129, guid: 220bd72c431aef34a86879e9eed10195,
         type: 3}
       propertyPath: m_Name
-      value: Borde derecho
+      value: Borde derecho Variant
       objectReference: {fileID: 0}
     - target: {fileID: 5421828019962178131, guid: 220bd72c431aef34a86879e9eed10195,
         type: 3}
@@ -80,7 +80,7 @@ PrefabInstance:
     - target: {fileID: 5421828019962178131, guid: 220bd72c431aef34a86879e9eed10195,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 75.47
+      value: 150.47
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 220bd72c431aef34a86879e9eed10195, type: 3}
