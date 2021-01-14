@@ -15,7 +15,7 @@ public class FallinLava : MonoBehaviour
     {
         rb2d = GetComponent<Rigidbody2D>();
         start = transform.position;
-        Invoke("Respawn",3f);
+        Invoke("Respawn",respawnDelay);
         
     }
 
@@ -27,6 +27,6 @@ public class FallinLava : MonoBehaviour
     {
         transform.position = start;
         rb2d.velocity = Vector3.zero;
-        Invoke("Respawn",3f);
+        Invoke("Respawn",respawnDelay);
     }
 }
