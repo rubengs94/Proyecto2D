@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Fallin : MonoBehaviour
 {
-    private float fallDelay = 0.5f;
-    private float respawnDelay = 5f;
+    private float fallDelay = 1f;
+    private float respawnDelay = 8f;
 
     private Rigidbody2D rb2d;
     private BoxCollider2D bc2d;

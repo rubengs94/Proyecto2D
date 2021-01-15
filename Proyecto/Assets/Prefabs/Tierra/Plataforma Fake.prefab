@@ -20,7 +20,7 @@ PrefabInstance:
     - target: {fileID: 3892584665637441244, guid: 9285759815b33e647b8e9909ac524d82,
         type: 3}
       propertyPath: m_Name
-      value: Plataforma Fake Variant
+      value: Plataforma Fake
       objectReference: {fileID: 0}
     - target: {fileID: 3892584665637441245, guid: 9285759815b33e647b8e9909ac524d82,
         type: 3}
@@ -35,7 +35,7 @@ PrefabInstance:
     - target: {fileID: 3892584665637441245, guid: 9285759815b33e647b8e9909ac524d82,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 128.92798
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3892584665637441245, guid: 9285759815b33e647b8e9909ac524d82,
         type: 3}

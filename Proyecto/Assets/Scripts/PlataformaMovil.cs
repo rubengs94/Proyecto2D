@@ -6,7 +6,7 @@ public class PlataformaMovil : MonoBehaviour
 {
 
     public Transform target;
-    private static float speed = 1;
+    public float speed = 1;
     private Vector3 start, end;
 
     // Start is called before the first frame update
