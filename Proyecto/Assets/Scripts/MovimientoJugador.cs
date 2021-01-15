@@ -43,10 +43,6 @@ public class MovimientoJugador : MonoBehaviour
         isGrounded=false;
     }
 
-    #region CHOQUE ENEMIGOS/TRAMPAS
-
-
-    #endregion
 
 
 }

@@ -245,8 +245,10 @@ public class SqlServer : MonoBehaviour
             }
             else
             {
-
-                cmd = new MySqlCommand("Insert_Excepcion", conexion);
+                //string cadenaExcepcion = "Server=sql144.main-hosting.eu;Port=3306;Database=u716344861_BBDDSamuel; Uid =u716344861_Samuel;Pwd=Rubencillo94";
+                //MySqlConnection conexionExcepcion = new MySqlConnection(cadenaExcepcion);
+                //cmd = new MySqlCommand("Insert_Excepcion", conexionExcepcion);
+                cmd = new MySqlCommand("Insert_Excepcion", conexion);//comentar esta linea si se activa el resto
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@text", texto);
                 cmd.Parameters.AddWithValue("@date", fecha);

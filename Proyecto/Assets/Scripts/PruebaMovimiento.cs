@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class PruebaMovimiento : MonoBehaviour
 {
@@ -52,18 +53,17 @@ public class PruebaMovimiento : MonoBehaviour
 			anim.SetBool("Speed",false);
             transform.Translate(0,0,0);
         }
-		
-		
-		
-		
-		//salto
-		if(jump){
-			anim.SetBool("Speed",false);
-			rb2d.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
-			jump=false;
-		}
-		//Debug.Log(rb2d.velocity.x);
-	}
+
+
+        //salto
+        if (jump)
+        {
+            anim.SetBool("Speed", false);
+            rb2d.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            jump = false;
+        }
+
+    }
 
     #region RESPAWN
 
@@ -79,12 +79,6 @@ public class PruebaMovimiento : MonoBehaviour
     {
         transform.position = new Vector3(-0.04f, -1.39f, 0.0f);
     }
-
-
-    #endregion
-
-    #region coins
-
 
 
     #endregion

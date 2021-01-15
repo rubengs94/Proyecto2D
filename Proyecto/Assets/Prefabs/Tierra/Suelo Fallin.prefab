@@ -33,8 +33,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 066e5f6119bf78c41be25859f2eaa218, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fallDelay: 1
-  respawnDelay: 5
 --- !u!1001 &744639761684592178
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -45,7 +43,7 @@ PrefabInstance:
     - target: {fileID: 768628011105102052, guid: cd0c528abaad3304fbfccb2a726adc54,
         type: 3}
       propertyPath: m_Name
-      value: Suelo Fallin Variant
+      value: Suelo Fallin
       objectReference: {fileID: 0}
     - target: {fileID: 768628011105102053, guid: cd0c528abaad3304fbfccb2a726adc54,
         type: 3}
@@ -61,6 +59,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.x
       value: 13.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 768628011105102053, guid: cd0c528abaad3304fbfccb2a726adc54,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1775624111406896102, guid: cd0c528abaad3304fbfccb2a726adc54,
         type: 3}
