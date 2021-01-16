@@ -118,19 +118,6 @@ public class CargarYGuardar : MonoBehaviour
 
 
     /// <summary>
-    /// Actualizar monedas y tiempo del usuario
-    /// </summary>
-    public void actualizarDatos()
-    {
-        ///cargamos las monedas y el tiempo de
-        ///controlpuntuacion y los guardamos
-
-        sql = new SqlServer();
-
-    }
-
-
-    /// <summary>
     /// Metodo para eliminar datos del usuario
     /// </summary>
     public void EliminarDatos()

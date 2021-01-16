@@ -62,13 +62,15 @@ public class SqlServer : MonoBehaviour
             conexion.Close();
 
         }
-        catch (MySqlException ex)
+        catch (Exception ex)
         {
             cmd.Cancel();
             conexion.Close();
             Publicar(GuidCargado+Codes.ErrorAlCargar.ToString()+ex.ToString(), "excepcion");
         }
     }//CargarDatosUsuario();
+
+
 
     /// <summary>
     /// Insertart datos del usuario
@@ -229,6 +231,9 @@ public class SqlServer : MonoBehaviour
     /// <param name="tipo"></param>
     public void Publicar(string texto, string tipo)
     {
+
+        string cadenaExcepcion = "Server=sql144.main-hosting.eu;Port=3306;Database=u716344861_SamuUnity; Uid =u716344861_Samuel;Pwd=5Samuellora";
+        MySqlConnection conexionExcepcion = new MySqlConnection(cadenaExcepcion);
         DateTime fecha = DateTime.Now;
         fecha.ToString("yyyy-MM-dd H:mm:ss");
 
@@ -237,7 +242,7 @@ public class SqlServer : MonoBehaviour
             if (tipo.Equals("log"))
             {
 
-                cmd = new MySqlCommand("Insert_Log", conexion);
+                cmd = new MySqlCommand("Insert_Log", conexionExcepcion);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@text", texto);
                 cmd.Parameters.AddWithValue("@date", fecha);
@@ -245,20 +250,19 @@ public class SqlServer : MonoBehaviour
             }
             else
             {
-                string cadenaExcepcion = "Server=sql144.main-hosting.eu;Port=3306;Database=u716344861_SamuUnity; Uid =u716344861_Samuel;Pwd=5Samuellora";
-                MySqlConnection conexionExcepcion = new MySqlConnection(cadenaExcepcion);
+                
                 cmd = new MySqlCommand("Insert_Excepcion", conexionExcepcion);
-                //cmd = new MySqlCommand("Insert_Excepcion", conexion);//comentar esta linea si se activa el resto
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@text", texto);
                 cmd.Parameters.AddWithValue("@date", fecha);
 
             }
 
-            conexion.Open();
+            conexionExcepcion.Open();
             cmd.ExecuteNonQuery();
-            conexion.Close();
+            conexionExcepcion.Close();
             Debug.Log(Codes.Log_Excepcion.ToString() + "///" + tipo);
+
         }
         catch (MySqlException ex)
         {
