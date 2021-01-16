@@ -5,7 +5,7 @@ using UnityEngine;
 public class FallinLava : MonoBehaviour
 {
     public float fallDelay = 0.5f;
-    public float respawnDelay = 5f;
+    public float respawnDelay = 2.3f;
 
     private Rigidbody2D rb2d;
     private BoxCollider2D bc2d;

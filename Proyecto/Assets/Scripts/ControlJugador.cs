@@ -9,10 +9,14 @@ public class ControlJugador : MonoBehaviour
     public GameObject gameOver;
     public Text texto;
     private BoxCollider2D bc2d;
+    private BoxCollider2D bc2dChildren;
+    private Rigidbody2D rb2d;
 
     private void Start()
     {
-        bc2d = GetComponent<BoxCollider2D>();
+        bc2d = GetComponentInParent<BoxCollider2D>();
+        bc2dChildren = GameObject.Find("CheckGround").GetComponent<BoxCollider2D>();
+        rb2d = GetComponent<Rigidbody2D>();
         gameOver.SetActive(false);
     }
 
@@ -25,7 +29,10 @@ public class ControlJugador : MonoBehaviour
             collision.gameObject.tag == "Enemy" ||
             collision.gameObject.tag == "Trampa" )
         {
+
             Destroy(bc2d);
+            Destroy(bc2dChildren);
+            rb2d.gravityScale = 0;
             gameOver.SetActive(true);
 
             if (collision.gameObject.tag == "Lava")
@@ -42,19 +49,26 @@ public class ControlJugador : MonoBehaviour
             {
                 texto.text = "Evita caer en trampas, presta atencion al entorno";
             }
+
             Time.timeScale = 0;
+
         }
     }
 
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+
         if (collision.gameObject.tag == "Lava")
         {
+
             Destroy(bc2d);
+            Destroy(bc2dChildren);
+            rb2d.gravityScale = 0;
             gameOver.SetActive(true);
             texto.text = "Consejo: Evita entrar en contacto con la lava";
             Time.timeScale = 0;
+
         }
     }
 
