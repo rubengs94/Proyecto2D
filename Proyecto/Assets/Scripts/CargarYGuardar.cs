@@ -18,8 +18,7 @@ public class CargarYGuardar : MonoBehaviour
     public Text monedas;
     public Button Jugar;
     public Button eliminar;
-    //private int monedas;
-    //private double tiempo;
+    public Button reportar;
     private string rutaPath;
 
     #endregion
@@ -103,6 +102,8 @@ public class CargarYGuardar : MonoBehaviour
                 eliminar.interactable = true;
                 nombre.interactable = false;
                 nombre.text = sql.NombreCargado;
+                reportar.enabled = true;
+                reportar.interactable = true;
                 monedas.text = "Monedas: "+sql.MonedasCargadas.ToString();
                 monedas.GetComponent<Text>().enabled = true;
             }
@@ -110,6 +111,8 @@ public class CargarYGuardar : MonoBehaviour
         }
         else
         {
+            reportar.enabled = false;
+            reportar.interactable = false;
             eliminar.enabled = false;
             eliminar.interactable = false;
             monedas.GetComponent<Text>().enabled = false;

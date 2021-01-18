@@ -829,6 +829,7 @@ MonoBehaviour:
   monedas: {fileID: 1945613501}
   Jugar: {fileID: 1245910477}
   eliminar: {fileID: 1895919897}
+  reportar: {fileID: 957868419}
 --- !u!4 &770951346
 Transform:
   m_ObjectHideFlags: 0
