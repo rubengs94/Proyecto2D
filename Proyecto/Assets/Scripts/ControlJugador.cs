@@ -7,6 +7,7 @@ public class ControlJugador : MonoBehaviour
 {
 
     public GameObject gameOver;
+    public GameObject Finish;
     public Text texto;
     private BoxCollider2D bc2d;
     private BoxCollider2D bc2dChildren;
@@ -18,6 +19,7 @@ public class ControlJugador : MonoBehaviour
         bc2dChildren = GameObject.Find("CheckGround").GetComponent<BoxCollider2D>();
         rb2d = GetComponent<Rigidbody2D>();
         gameOver.SetActive(false);
+        Finish.SetActive(false);
     }
 
 
@@ -27,7 +29,8 @@ public class ControlJugador : MonoBehaviour
 
         if (collision.gameObject.tag == "Lava" ||
             collision.gameObject.tag == "Enemy" ||
-            collision.gameObject.tag == "Trampa" )
+            collision.gameObject.tag == "Trampa" ||
+            collision.gameObject.tag == "Yeti")
         {
 
             Destroy(bc2d);
@@ -50,6 +53,11 @@ public class ControlJugador : MonoBehaviour
                 texto.text = "Evita caer en trampas, presta atencion al entorno";
             }
 
+            if (collision.gameObject.tag == "Yeti")
+            {
+                texto.text = "Salta por encima de los yetis para seguir el camino";
+            }
+
             Time.timeScale = 0;
 
         }
@@ -70,11 +78,20 @@ public class ControlJugador : MonoBehaviour
             Time.timeScale = 0;
 
         }
+
+        if(collision.gameObject.tag == "EstrellaFin")
+        {
+            Finish.SetActive(true);
+            rb2d.gravityScale = 0;
+            Time.timeScale = 0;
+        }
+
     }
 
 
     public void QuitarUI()
     {
         gameOver.SetActive(false);
+        Finish.SetActive(false);
     }
 }

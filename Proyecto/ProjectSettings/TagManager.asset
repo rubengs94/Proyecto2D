@@ -11,6 +11,8 @@ TagManager:
   - Enemy
   - Lava
   - Trampa
+  - EstrellaFin
+  - Yeti
   layers:
   - Default
   - TransparentFX
