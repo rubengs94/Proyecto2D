@@ -9,18 +9,14 @@ public class CargarYGuardar : MonoBehaviour
     #region PROPIEDADES
 
     SqlServer sql;
-    ControlPuntuacion controlpuntuacion;
     private JsonData itemData;
     private string jsonText;
-    //variables de usuario
     private string guid;
     public InputField nombre;
     public Text monedas;
     public Button Jugar;
     public Button eliminar;
 	public Button reportar;
-    //private int monedas;
-    //private double tiempo;
     private string rutaPath;
 
     #endregion
@@ -64,7 +60,7 @@ public class CargarYGuardar : MonoBehaviour
             {
 
                 guid = sql.GenerarGuid();
-                sql.InsertarDatos(guid, nombre.text, 0, "00","00");
+                sql.InsertarDatos(guid, nombre.text, 0, "00","00", 0, false);
 
                 GuardarGuid guidJson = new GuardarGuid(guid);
                 itemData = JsonMapper.ToJson(guidJson);
@@ -98,27 +94,50 @@ public class CargarYGuardar : MonoBehaviour
 
             sql.CargarDatosUsuario(guid);
 
-            if (!String.IsNullOrEmpty(sql.NombreCargado))
+            if (!sql.BanCargado && sql.PartidasCargadas * 34 >= sql.MonedasCargadas)//Si no está baneado, cargamos datos y no tiene mas monedas de las normales
             {
-                reportar.enabled = true;
-                reportar.interactable = true;
-				eliminar.enabled = true;
-                eliminar.interactable = true;
-                nombre.interactable = false;
-                nombre.text = sql.NombreCargado;
-                monedas.text = "Monedas: "+sql.MonedasCargadas.ToString();
-                monedas.GetComponent<Text>().enabled = true;
-            }
 
+                if (!String.IsNullOrEmpty(sql.NombreCargado))
+                {
+                    reportar.enabled = true;
+                    reportar.interactable = true;
+                    eliminar.enabled = true;
+                    eliminar.interactable = true;
+                    nombre.interactable = false;
+                    nombre.text = sql.NombreCargado;
+                    monedas.fontSize = 25;
+                    monedas.color = Color.black;
+                    monedas.text = "Monedas: " + sql.MonedasCargadas.ToString();
+                    monedas.GetComponent<Text>().enabled = true;
+                }
+            }
+            else
+            {
+                sql.Banear(guid);
+                nombre.interactable = false;
+                Jugar.enabled = false;
+                Jugar.interactable = false;
+                eliminar.enabled = false;
+                eliminar.interactable = false;
+                monedas.fontSize = 20;
+                monedas.color = Color.red;
+                monedas.text = "Has sido baneado, póngase en contacto con el administrador del juego";
+            }
         }
         else
         {
-			reportar.enabled = false;
-			reportar.interactable = false;
+            reportar.enabled = false;
+            reportar.interactable = false;
             eliminar.enabled = false;
             eliminar.interactable = false;
             monedas.GetComponent<Text>().enabled = false;
         }
+            
+            
+
+        
+        
+
     }//Cargar()
 
 

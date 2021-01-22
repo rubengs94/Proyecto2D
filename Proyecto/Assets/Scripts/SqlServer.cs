@@ -26,6 +26,8 @@ public class SqlServer : MonoBehaviour
     public int MonedasCargadas;
     public string MinutosCargados;
     public string SegundosCargados;
+    public int PartidasCargadas;
+    public bool BanCargado;
 
     #endregion
 
@@ -56,6 +58,8 @@ public class SqlServer : MonoBehaviour
                 MonedasCargadas = int.Parse(dt.Rows[0]["Monedas"].ToString());
                 MinutosCargados = (dt.Rows[0]["Minutos"].ToString());
                 SegundosCargados = (dt.Rows[0]["Segundos"].ToString());
+                PartidasCargadas = int.Parse((dt.Rows[0]["Partidas"].ToString()));
+                BanCargado = bool.Parse((dt.Rows[0]["Baneado"].ToString()));
 
             }
 
@@ -79,7 +83,7 @@ public class SqlServer : MonoBehaviour
     /// <param name="nombre">Nombre del usuario</param>
     /// <param name="monedas">Monedas en la cuenta</param>
     /// <param name="tiempo">Tiempo record del juego</param>
-    public void InsertarDatos(string guid, string nombre, int monedas, string Minutos, string Segundos)
+    public void InsertarDatos(string guid, string nombre, int monedas, string Minutos, string Segundos, int Partidas, bool Ban)
     {
 
         try
@@ -92,6 +96,8 @@ public class SqlServer : MonoBehaviour
             cmd.Parameters.AddWithValue("@Monedas", monedas);
             cmd.Parameters.AddWithValue("@Minutos", Minutos);
             cmd.Parameters.AddWithValue("@Segundos", Segundos);
+            cmd.Parameters.AddWithValue("@Partidas", Segundos);
+            cmd.Parameters.AddWithValue("@Baneado", Segundos);
 
             conexion.Open();
             cmd.ExecuteNonQuery();
@@ -314,6 +320,36 @@ public class SqlServer : MonoBehaviour
 
     }
 
+
+    #endregion
+
+
+    #region BANEAR
+
+    public void Banear(string GuidBan)
+    {
+
+        try
+        { 
+
+            conexion = new MySqlConnection(cadenaConexion);
+            cmd = new MySqlCommand("Ban_Player", conexion);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@GuidBan", GuidBan);
+
+            conexion.Open();
+            cmd.ExecuteNonQuery();
+            conexion.Close();
+
+            
+        }
+        catch (MySqlException ex)
+        {
+            cmd.Cancel();
+            conexion.Close();
+            Publicar(GuidCargado + Codes.ErrorAlEliminar.ToString() + ex.ToString(), "excepcion");
+        }
+    }
 
     #endregion
 
