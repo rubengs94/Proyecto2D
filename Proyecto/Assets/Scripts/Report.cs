@@ -8,6 +8,7 @@ public class Report : MonoBehaviour
 
     #region PROPIEDADES
 
+    public InputField emailReport;
     public InputField tituloReport;
     public InputField textoReport;
     SqlServer sql;
@@ -19,8 +20,9 @@ public class Report : MonoBehaviour
     public void Enviar()
     {
         sql = new SqlServer();
-        sql.Report(tituloReport.text, textoReport.text);
+        sql.Report(emailReport.text, tituloReport.text, textoReport.text);
 
+        emailReport.text = "";
         tituloReport.text = "";
         textoReport.text = "";
     }

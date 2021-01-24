@@ -3,6 +3,8 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Data;
 using System.IO;
+using System.Net;
+using System.Net.Mail;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -41,12 +43,12 @@ public class SqlServer : MonoBehaviour
     {
         try
         {
-            query = "SELECT * FROM datosjugador WHERE Guid like '"+ guid +"';";
+            query = "SELECT * FROM datosjugador WHERE Guid like '" + guid + "';";
             cmd = new MySqlCommand(query, conexion);
             conexion.Open();
             cmd.ExecuteNonQuery();
             conexion.Close();
-            
+
             adaptador = new MySqlDataAdapter(query, conexion);
             dt = new DataTable();
             adaptador.Fill(dt);
@@ -58,8 +60,6 @@ public class SqlServer : MonoBehaviour
                 MonedasCargadas = int.Parse(dt.Rows[0]["Monedas"].ToString());
                 MinutosCargados = (dt.Rows[0]["Minutos"].ToString());
                 SegundosCargados = (dt.Rows[0]["Segundos"].ToString());
-                PartidasCargadas = int.Parse((dt.Rows[0]["Partidas"].ToString()));
-                BanCargado = bool.Parse((dt.Rows[0]["Baneado"].ToString()));
 
             }
 
@@ -70,7 +70,7 @@ public class SqlServer : MonoBehaviour
         {
             cmd.Cancel();
             conexion.Close();
-            Publicar(GuidCargado+Codes.ErrorAlCargar.ToString()+ex.ToString(), "excepcion");
+            Publicar(GuidCargado + Codes.ErrorAlCargar.ToString() + ex.ToString(), "excepcion");
         }
     }//CargarDatosUsuario();
 
@@ -96,8 +96,8 @@ public class SqlServer : MonoBehaviour
             cmd.Parameters.AddWithValue("@Monedas", monedas);
             cmd.Parameters.AddWithValue("@Minutos", Minutos);
             cmd.Parameters.AddWithValue("@Segundos", Segundos);
-            cmd.Parameters.AddWithValue("@Partidas", Segundos);
-            cmd.Parameters.AddWithValue("@Baneado", Segundos);
+            cmd.Parameters.AddWithValue("@Partidas", Partidas);
+            cmd.Parameters.AddWithValue("@Baneado", Ban);
 
             conexion.Open();
             cmd.ExecuteNonQuery();
@@ -110,7 +110,7 @@ public class SqlServer : MonoBehaviour
         {
             cmd.Cancel();
             conexion.Close();
-            Publicar(guid+Codes.ErrorAlInsertar.ToString()+ex.ToString(), "excepcion");
+            Publicar(guid + Codes.ErrorAlInsertar.ToString() + ex.ToString(), "excepcion");
         }
     }//InsertarDatos();
 
@@ -137,7 +137,7 @@ public class SqlServer : MonoBehaviour
             //Si el tiempo nuevo es mayor que en la base de datos
             //guardamos el tiempo y actualizamos
             //Si es menor, actualizamos solo las monedas
-            if (float.Parse(minutos) >= float.Parse(MinutosCargados) && 
+            if (float.Parse(minutos) >= float.Parse(MinutosCargados) &&
                 float.Parse(segundos) >= float.Parse(SegundosCargados))
             {
 
@@ -163,7 +163,7 @@ public class SqlServer : MonoBehaviour
         {
             cmd.Cancel();
             conexion.Close();
-            Publicar(GuidCargado+Codes.ErrorAlActualizar.ToString()+ex.ToString(), "excepcion");
+            Publicar(GuidCargado + Codes.ErrorAlActualizar.ToString() + ex.ToString(), "excepcion");
         }
     }//ActualizarDatos();
 
@@ -200,7 +200,7 @@ public class SqlServer : MonoBehaviour
         {
             cmd.Cancel();
             conexion.Close();
-            Publicar(GuidCargado+Codes.ErrorAlEliminar.ToString()+ex.ToString(), "excepcion");
+            Publicar(GuidCargado + Codes.ErrorAlEliminar.ToString() + ex.ToString(), "excepcion");
         }
     }//EliminarDatos();
 
@@ -256,7 +256,7 @@ public class SqlServer : MonoBehaviour
             }
             else
             {
-                
+
                 cmd = new MySqlCommand("Insert_Excepcion", conexionExcepcion);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@text", texto);
@@ -313,16 +313,45 @@ public class SqlServer : MonoBehaviour
 
 
         }
-        catch(MySqlException ex)
+        catch (MySqlException ex)
         {
-            Publicar(Codes.ErrorReport+ex.ToString(), "excepcion");
+            Publicar(Codes.ErrorReport + ex.ToString(), "excepcion");
         }
 
     }
 
 
-    #endregion
+    public void Report(string emailReport, string tituloReport, string textoReport)
+    {
 
+        MailMessage message = new MailMessage();
+        message.IsBodyHtml = true;
+        message.Priority = MailPriority.Normal;
+        message.From = new MailAddress("rubengonsi94@gmail.com", "Soporte Jumping Pixels");
+        message.To.Add(new MailAddress("jumpingsupp@gmail.com"));
+        message.Subject = tituloReport;
+        message.Body = "<html><body><br>Correo: " + emailReport + "<br><br>" + textoReport + "</body></html>";
+
+        SmtpClient smtp = new SmtpClient();
+        smtp.Host = "smtp.gmail.com";
+        smtp.Port = 25;
+        smtp.EnableSsl = true;
+        smtp.UseDefaultCredentials = false;
+        smtp.Credentials = new NetworkCredential("rubengonsi94@gmail.com", "Rubencillo94");
+
+        try
+        {
+            smtp.Send(message);
+        }
+        catch (SmtpException ex)
+        {
+            Report(tituloReport, textoReport);
+            Publicar("Error al enviar reporte" + ex, "excepcion");
+        }
+
+    }
+
+    #endregion
 
     #region BANEAR
 
@@ -330,7 +359,7 @@ public class SqlServer : MonoBehaviour
     {
 
         try
-        { 
+        {
 
             conexion = new MySqlConnection(cadenaConexion);
             cmd = new MySqlCommand("Ban_Player", conexion);
@@ -341,7 +370,7 @@ public class SqlServer : MonoBehaviour
             cmd.ExecuteNonQuery();
             conexion.Close();
 
-            
+
         }
         catch (MySqlException ex)
         {
@@ -363,7 +392,7 @@ public class SqlServer : MonoBehaviour
     public string GenerarGuid()
     {
 
-        string nuevoGuid = Guid.NewGuid().ToString().Substring(0,13);
+        string nuevoGuid = Guid.NewGuid().ToString().Substring(0, 13);
         try
         {
             if (!ComprobarGuid(nuevoGuid))
@@ -382,7 +411,7 @@ public class SqlServer : MonoBehaviour
 
         return Guid.Empty.ToString(); ;
     }
-   
+
     /// <summary>
     /// Comprobar si existe el guid en la base de datos
     /// </summary>
