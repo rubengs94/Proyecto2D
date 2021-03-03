@@ -60,7 +60,7 @@ public class CargarYGuardar : MonoBehaviour
             {
 
                 guid = sql.GenerarGuid();
-                sql.InsertarDatos(guid, nombre.text, 0, "00","00", 0, false);
+                sql.InsertarDatos(guid, nombre.text, 0, "00","00", 0, 0);//El ultimo 0 era "false"
 
                 GuardarGuid guidJson = new GuardarGuid(guid);
                 itemData = JsonMapper.ToJson(guidJson);
@@ -94,7 +94,7 @@ public class CargarYGuardar : MonoBehaviour
 
             sql.CargarDatosUsuario(guid);
 
-            if (!sql.BanCargado && sql.PartidasCargadas * 34 >= sql.MonedasCargadas)//Si no está baneado, cargamos datos y no tiene mas monedas de las normales
+            if (sql.BanCargado!=1 && sql.PartidasCargadas * 34 >= sql.MonedasCargadas)//Si no está baneado, cargamos datos y no tiene mas monedas de las normales
             {
 
                 if (!String.IsNullOrEmpty(sql.NombreCargado))
