@@ -14,7 +14,7 @@ public class SqlServer : MonoBehaviour
     #region PROPIEDADES
 
     //static readonly string cadenaConexion = "Server=localhost;Database=servidorjuego;Uid=root;Pwd=";
-    static readonly string cadenaConexion = "Server=sql144.main-hosting.eu;Port=3306;Database=u716344861_servidorjuego;Uid=u716344861_servidorunity;Pwd=Rubencillo94";
+    static readonly string cadenaConexion = "Server=sql168.main-hosting.eu;Port=3306;Database=u195758784_Principal;Uid=u195758784_samu;Pwd=Samu1997";
     static MySqlConnection conexion = new MySqlConnection(cadenaConexion);
     static readonly string rutaPath = Application.dataPath + "/Guid.json";
     MySqlCommand cmd;
@@ -29,7 +29,7 @@ public class SqlServer : MonoBehaviour
     public string MinutosCargados;
     public string SegundosCargados;
     public int PartidasCargadas;
-    public bool BanCargado;
+    public int BanCargado;
 
     #endregion
 
@@ -60,7 +60,8 @@ public class SqlServer : MonoBehaviour
                 MonedasCargadas = int.Parse(dt.Rows[0]["Monedas"].ToString());
                 MinutosCargados = (dt.Rows[0]["Minutos"].ToString());
                 SegundosCargados = (dt.Rows[0]["Segundos"].ToString());
-
+                PartidasCargadas = int.Parse(dt.Rows[0]["Partidas"].ToString());//Fatalba cargar las partidas
+				BanCargado = int.Parse(dt.Rows[0]["Baneado"].ToString());//He cambiado a int la propiedad
             }
 
             conexion.Close();
@@ -83,7 +84,7 @@ public class SqlServer : MonoBehaviour
     /// <param name="nombre">Nombre del usuario</param>
     /// <param name="monedas">Monedas en la cuenta</param>
     /// <param name="tiempo">Tiempo record del juego</param>
-    public void InsertarDatos(string guid, string nombre, int monedas, string Minutos, string Segundos, int Partidas, bool Ban)
+    public void InsertarDatos(string guid, string nombre, int monedas, string Minutos, string Segundos, int Partidas, int Ban)
     {
 
         try
@@ -238,7 +239,7 @@ public class SqlServer : MonoBehaviour
     public void Publicar(string texto, string tipo)
     {
 
-        string cadenaExcepcion = "Server=sql144.main-hosting.eu;Port=3306;Database=u716344861_SamuUnity; Uid =u716344861_Samuel;Pwd=5Samuellora";
+        string cadenaExcepcion = "Server=sql168.main-hosting.eu;Port=3306;Database=u195758784_Secundaria; Uid=u195758784_samu2;Pwd=Samu1997";
         MySqlConnection conexionExcepcion = new MySqlConnection(cadenaExcepcion);
         DateTime fecha = DateTime.Now;
         fecha.ToString("yyyy-MM-dd H:mm:ss");
@@ -284,6 +285,12 @@ public class SqlServer : MonoBehaviour
 
     #region SYSTEM REPORT
 
+
+    /// <summary>
+    /// Reporte en la base de datos
+    /// </summary>
+    /// <param name="tituloReport"></param>
+    /// <param name="textoReport"></param>
     public void Report(string tituloReport, string textoReport)
     {
 
@@ -321,6 +328,12 @@ public class SqlServer : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Envio de correo del usuario
+    /// </summary>
+    /// <param name="emailReport"></param>
+    /// <param name="tituloReport"></param>
+    /// <param name="textoReport"></param>
     public void Report(string emailReport, string tituloReport, string textoReport)
     {
 
