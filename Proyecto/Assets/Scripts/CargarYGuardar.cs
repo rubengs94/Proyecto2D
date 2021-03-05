@@ -60,7 +60,7 @@ public class CargarYGuardar : MonoBehaviour
             {
 
                 guid = sql.GenerarGuid();
-                sql.InsertarDatos(guid, nombre.text, 0, "00","00", 0, 0);//El ultimo 0 era "false"
+                sql.InsertarDatos(guid, nombre.text, 0, "00","00", 0, 0, 0);//El penultimo 0 era "false"
 
                 GuardarGuid guidJson = new GuardarGuid(guid);
                 itemData = JsonMapper.ToJson(guidJson);

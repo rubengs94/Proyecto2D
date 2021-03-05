@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Reportar.unity
     guid: 94442385bd3dd694796cba53da4df932
+  - enabled: 1
+    path: Assets/Scenes/Shop.unity
+    guid: 4bf32652a3f9f6941a9ab4d0c90e86c1
   m_configObjects: {}
