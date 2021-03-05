@@ -1,6 +1,7 @@
 ﻿using LitJson;
 using MySql.Data.MySqlClient;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Net;
@@ -13,8 +14,8 @@ public class SqlServer : MonoBehaviour
 
     #region PROPIEDADES
 
-    //static readonly string cadenaConexion = "Server=localhost;Database=servidorjuego;Uid=root;Pwd=";
-    static readonly string cadenaConexion = "Server=sql168.main-hosting.eu;Port=3306;Database=u195758784_Principal;Uid=u195758784_samu;Pwd=Samu1997";
+    static readonly string cadenaConexion = "Server=localhost;Database=servidorjuego;Uid=root;Pwd=";
+    //static readonly string cadenaConexion = "Server=sql168.main-hosting.eu;Port=3306;Database=u195758784_Principal;Uid=u195758784_samu;Pwd=Samu1997";
     static MySqlConnection conexion = new MySqlConnection(cadenaConexion);
     static readonly string rutaPath = Application.dataPath + "/Guid.json";
     MySqlCommand cmd;
@@ -30,6 +31,7 @@ public class SqlServer : MonoBehaviour
     public string SegundosCargados;
     public int PartidasCargadas;
     public int BanCargado;
+    public int SkinCargada;
 
     #endregion
 
@@ -62,6 +64,7 @@ public class SqlServer : MonoBehaviour
                 SegundosCargados = (dt.Rows[0]["Segundos"].ToString());
                 PartidasCargadas = int.Parse(dt.Rows[0]["Partidas"].ToString());//Fatalba cargar las partidas
 				BanCargado = int.Parse(dt.Rows[0]["Baneado"].ToString());//He cambiado a int la propiedad
+                SkinCargada = int.Parse(dt.Rows[0]["Skin"].ToString());
             }
 
             conexion.Close();
@@ -84,7 +87,7 @@ public class SqlServer : MonoBehaviour
     /// <param name="nombre">Nombre del usuario</param>
     /// <param name="monedas">Monedas en la cuenta</param>
     /// <param name="tiempo">Tiempo record del juego</param>
-    public void InsertarDatos(string guid, string nombre, int monedas, string Minutos, string Segundos, int Partidas, int Ban)
+    public void InsertarDatos(string guid, string nombre, int monedas, string Minutos, string Segundos, int Partidas, int Ban, int Skin)
     {
 
         try
@@ -99,6 +102,7 @@ public class SqlServer : MonoBehaviour
             cmd.Parameters.AddWithValue("@Segundos", Segundos);
             cmd.Parameters.AddWithValue("@Partidas", Partidas);
             cmd.Parameters.AddWithValue("@Baneado", Ban);
+            cmd.Parameters.AddWithValue("@Skin", Skin);
 
             conexion.Open();
             cmd.ExecuteNonQuery();
@@ -207,6 +211,140 @@ public class SqlServer : MonoBehaviour
 
     #endregion
 
+    #region SKINS
+    
+
+    /// <summary>
+    /// Lista de skins compradasdel usuario
+    /// </summary>
+    /// <param name="guid"></param>
+    /// <returns></returns>
+    public List<int> SkinsCompradas(string guid)
+    {
+        List<int> SkinsCompradas = new List<int>();
+
+        try
+        {
+            cmd = new MySqlCommand("Skin_Player", conexion);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@guidPlayer", guid);
+
+            conexion.Open();
+            cmd.ExecuteNonQuery();
+            conexion.Close();
+
+            adaptador = new MySqlDataAdapter(cmd);
+            dt = new DataTable();
+            adaptador.Fill(dt);
+
+            if (dt.Rows.Count > 0)
+            {
+                foreach (DataRow row in dt.Rows)
+                    SkinsCompradas.Add(int.Parse(row["idSkin"].ToString()));
+
+            }
+
+            conexion.Close();
+
+        }
+        catch (MySqlException ex)
+        {
+            Debug.Log(ex);
+        }
+
+        return SkinsCompradas;
+    }
+
+
+    public void Comprar(string guid, int idSkin, int precio)
+    {
+        
+        try
+        {
+                cmd = new MySqlCommand("Buy_Skin", conexion);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@GuidJugador", guid);
+                cmd.Parameters.AddWithValue("@idSkin", idSkin);
+                cmd.Parameters.AddWithValue("@precio", precio);
+
+                conexion.Open();
+                cmd.ExecuteNonQuery();
+                conexion.Close();
+        }
+        catch (MySqlException ex)
+        {
+            cmd.Cancel();
+            conexion.Close();
+            Debug.Log(ex);
+        }
+
+
+    }
+
+    /// <summary>
+    /// Equipar una skin nueva
+    /// </summary>
+    /// <param name="guid"></param>
+    public void Equipar(string guid, int idSkin)
+    {
+        
+        try
+        {
+
+            cmd = new MySqlCommand("Equip_Skin", conexion);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@guidJugador", guid);
+            cmd.Parameters.AddWithValue("@idSkin", idSkin);
+
+            conexion.Open();
+            cmd.ExecuteNonQuery();
+            conexion.Close();
+
+        }
+        catch (MySqlException ex)
+        {
+            cmd.Cancel();
+            conexion.Close();
+            Debug.Log(ex);
+        }
+
+
+    }
+
+
+    public int CargarSkin(string guid)
+    {
+        int skin = 0;
+
+        try
+        {
+            cmd = new MySqlCommand("info_Skin", conexion);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@guidJugador", guid);
+
+            conexion.Open();
+            cmd.ExecuteNonQuery();
+            conexion.Close();
+
+            adaptador = new MySqlDataAdapter(cmd);
+            dt = new DataTable();
+            adaptador.Fill(dt);
+
+            if(dt.Rows.Count > 0)
+                foreach(DataRow row in dt.Rows)
+                    skin = int.Parse(row["Skin"].ToString());
+
+        }
+        catch (MySqlException ex)
+        {
+            Debug.Log(ex);
+        }
+
+        return skin;
+    }
+
+    #endregion
+
 
     #region LOG/EXCEPCIONES
 
@@ -238,8 +376,8 @@ public class SqlServer : MonoBehaviour
     /// <param name="tipo"></param>
     public void Publicar(string texto, string tipo)
     {
-
-        string cadenaExcepcion = "Server=sql168.main-hosting.eu;Port=3306;Database=u195758784_Secundaria; Uid=u195758784_samu2;Pwd=Samu1997";
+        string cadenaExcepcion = "Server=localhost;Database=logjuego;Uid=root;Pwd=";
+        //string cadenaExcepcion = "Server=sql168.main-hosting.eu;Port=3306;Database=u195758784_Secundaria; Uid=u195758784_samu2;Pwd=Samu1997";
         MySqlConnection conexionExcepcion = new MySqlConnection(cadenaExcepcion);
         DateTime fecha = DateTime.Now;
         fecha.ToString("yyyy-MM-dd H:mm:ss");
@@ -365,6 +503,7 @@ public class SqlServer : MonoBehaviour
     }
 
     #endregion
+
 
     #region BANEAR
 

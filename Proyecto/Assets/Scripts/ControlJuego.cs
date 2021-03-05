@@ -53,6 +53,7 @@ public class ControlJuego : MonoBehaviour
         SceneManager.LoadScene(juego);   
     }
 
+
     public void Exit()
     {
         Application.Quit();
