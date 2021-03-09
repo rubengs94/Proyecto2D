@@ -1038,6 +1038,7 @@ MonoBehaviour:
   Jugar: {fileID: 1245910477}
   eliminar: {fileID: 1895919897}
   reportar: {fileID: 957868419}
+  tienda: {fileID: 116539778}
 --- !u!4 &770951346
 Transform:
   m_ObjectHideFlags: 0

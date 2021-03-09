@@ -21,6 +21,7 @@ public class ControlPuntuacion : MonoBehaviour
 
     #endregion
 
+
     #region CARGAR Y GUARDAR
 
     public void guardarDatos()
