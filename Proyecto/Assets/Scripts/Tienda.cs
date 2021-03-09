@@ -15,6 +15,7 @@ public class Tienda : MonoBehaviour
     public Button [] botones;
     public Text[] textos;
     private List<int> SkinsJugador;
+    public Text error;
 
     // Start is called before the first frame update
     void Start()
@@ -66,10 +67,13 @@ public class Tienda : MonoBehaviour
     public void Equipar_Comprar(int idSkin)
     {
 
+        error.text = "";
         if (textos[idSkin].text != "Equipar" && textos[idSkin].text != "Equipada")
         {
-            if (sql.MonedasCargadas >= idSkin*100)
-                sql.Comprar(guid, idSkin, idSkin*100);
+            if (sql.MonedasCargadas >= idSkin * 100)
+                sql.Comprar(guid, idSkin, idSkin * 100);
+            else
+                error.text = "No tienes suficientes monedas";
         }
         else
             sql.Equipar(guid, idSkin);

@@ -17,6 +17,7 @@ public class CargarYGuardar : MonoBehaviour
     public Button Jugar;
     public Button eliminar;
 	public Button reportar;
+    public Button tienda;
     private string rutaPath;
 
     #endregion
@@ -119,6 +120,8 @@ public class CargarYGuardar : MonoBehaviour
                 Jugar.interactable = false;
                 eliminar.enabled = false;
                 eliminar.interactable = false;
+                tienda.enabled = false;
+                tienda.interactable = false;
                 monedas.fontSize = 20;
                 monedas.color = Color.red;
                 monedas.text = "Has sido baneado, póngase en contacto con el administrador del juego";
